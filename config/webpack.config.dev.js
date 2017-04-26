@@ -1,8 +1,10 @@
 'use strict';
 
+var path = require('path')
 var autoprefixer = require('autoprefixer');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 var WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
@@ -74,11 +76,18 @@ module.exports = {
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.js', '.json', '.jsx', ''],
+    extensions: ['.js', '.json', '.jsx', '.styl', ''],
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-      'react-native': 'react-native-web'
+      'react-native': 'react-native-web',
+      '~assets': paths.srcAssets,
+      '~components': paths.srcComponents,
+      '~containers': paths.srcContainers,
+      '~service': paths.srcService,
+      '~reducers': paths.srcReducers,
+      '~actions': paths.srcActions,
+      '~config': paths.srcConfig
     }
   },
   
@@ -142,8 +151,13 @@ module.exports = {
       // In production, we use a plugin to extract that CSS to a file, but
       // in development "style" loader enables hot editing of CSS.
       {
-        test: /\.css$/,
+        test: /\.css$/i,
         loader: 'style!css?importLoaders=1!postcss'
+      },
+      {
+        test: /\.styl$/i,
+        exclude: /node_modules/,
+        loader: ExtractTextPlugin.extract('style', 'css!postcss!stylus')
       },
       // JSON is not enabled by default in Webpack but both Node and Browserify
       // allow it implicitly so we also enable it.
@@ -188,6 +202,7 @@ module.exports = {
       inject: true,
       template: paths.appHtml,
     }),
+    new ExtractTextPlugin('static/css/[name].css', {allChunks: true}),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
     new webpack.DefinePlugin(env.stringified),
