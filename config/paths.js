@@ -81,7 +81,9 @@ module.exports = {
   srcComponents: resolveApp('src/components'),
   srcService: resolveApp('src/service'),
   srcAssets: resolveApp('src/assets'),
+  srcStore: resolveApp('src/store'),
   srcReducers: resolveApp('src/store/reducers'),
   srcActions: resolveApp('src/store/actions'),
-  srcConfig: resolveApp('src/config')
+  srcConfig: resolveApp('src/config'),
+  srcUtils: resolveApp('src/utils')
 };

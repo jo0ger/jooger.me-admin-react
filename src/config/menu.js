@@ -1,102 +1,50 @@
 module.exports = [
   {
     key: 'dashboard',
-    name: 'Dashboard',
+    name: '仪表盘',
     icon: 'laptop',
   },
   {
-    key: 'users',
-    name: 'User Manage',
-    icon: 'user',
-  },
-  {
-    key: 'request',
-    name: 'Request',
-    icon: 'api',
-  },
-  {
-    key: 'UIElement',
-    name: 'UI Element',
-    icon: 'camera-o',
+    key: 'article',
+    name: '文章管理',
+    icon: 'folder',
     clickable: false,
     child: [
       {
-        key: 'iconfont',
-        name: 'IconFont',
-        icon: 'heart-o',
+        key: 'all',
+        name: '全部文章',
+        icon: 'copy',
       },
       {
-        key: 'dataTable',
-        name: 'DataTable',
-        icon: 'database',
+        key: 'category',
+        name: '分类管理',
+        icon: 'appstore',
       },
       {
-        key: 'dropOption',
-        name: 'DropOption',
-        icon: 'bars',
+        key: 'tag',
+        name: '标签管理',
+        icon: 'tag-o',
       },
       {
-        key: 'search',
-        name: 'Search',
-        icon: 'search',
-      },
-      {
-        key: 'editor',
-        name: 'Editor',
-        icon: 'edit',
-      },
-      {
-        key: 'layer',
-        name: 'layer (Function)',
-        icon: 'credit-card',
-      },
+        key: 'publish',
+        name: '发布文章',
+        icon: 'file-add',
+      }
     ],
   },
   {
-    key: 'chart',
-    name: 'Recharts',
-    icon: 'code-o',
-    child: [
-      {
-        key: 'lineChart',
-        name: 'LineChart',
-        icon: 'line-chart',
-      },
-      {
-        key: 'barChart',
-        name: 'BarChart',
-        icon: 'bar-chart',
-      },
-      {
-        key: 'areaChart',
-        name: 'AreaChart',
-        icon: 'area-chart',
-      },
-    ],
+    key: 'music',
+    name: '音乐管理',
+    icon: 'customer-service'
   },
   {
-    key: 'navigation',
-    name: 'Test Navigation',
-    icon: 'setting',
-    child: [
-      {
-        key: 'navigation1',
-        name: 'Test Navigation1',
-      },
-      {
-        key: 'navigation2',
-        name: 'Test Navigation2',
-        child: [
-          {
-            key: 'navigation21',
-            name: 'Test Navigation21',
-          },
-          {
-            key: 'navigation22',
-            name: 'Test Navigation22',
-          },
-        ],
-      },
-    ],
+    key: 'gallery',
+    name: '图片管理',
+    icon: 'picture'
   },
+  {
+    key: 'setting',
+    name: '全局设置',
+    icon: 'setting'
+  }
 ]

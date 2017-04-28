@@ -85,9 +85,11 @@ module.exports = {
       '~components': paths.srcComponents,
       '~containers': paths.srcContainers,
       '~service': paths.srcService,
+      '~store': paths.srcStore,
       '~reducers': paths.srcReducers,
       '~actions': paths.srcActions,
-      '~config': paths.srcConfig
+      '~config': paths.srcConfig,
+      '~utils': paths.srcUtils
     }
   },
   

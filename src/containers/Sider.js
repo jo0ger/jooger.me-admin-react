@@ -1,46 +1,65 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { NavLink } from 'react-router-dom'
-import { Layout, Menu, Icon } from 'antd'
+import { Icon, Switch } from 'antd'
+import Menus from '~components/Menus'
 import { menu } from '~config'
-const AntdSider = Layout.Sider
+import { classnames } from '~utils'
+import {
+  changeTheme,
+  toggleSider
+} from '~actions'
 
 class Sider extends Component {
   static propTypes = {
-    collapsed: PropTypes.bool
+    fold: PropTypes.bool.isRequired,
+    theme: PropTypes.string.isRequired,
+    changeTheme: PropTypes.func.isRequired
+  }
+
+  changeTheme = (val) => {
+    this.props.changeTheme(val ? 'light' : 'dark')
   }
 
   render () {
+    const { fold, theme } = this.props
     return (
-      <AntdSider
-        trigger={null}
-        collapsible
-        collapsed={this.props.collapsed}>
-        <div className="logo" />
-          <Menu
-            theme="dark"
-            mode="inline"
-            defaultSelectedKeys={['2']}>
-            <Menu.Item key="1">
-              <Icon type="user" />
-              <span className="nav-text">nav 1</span>
-            </Menu.Item>
-            <Menu.Item key="2">
-              <Icon type="video-camera" />
-              <span className="nav-text">nav 2</span>
-            </Menu.Item>
-            <Menu.Item key="3">
-              <Icon type="upload" />
-              <span className="nav-text">nav 3</span>
-            </Menu.Item>
-            <Menu.Item key="4">
-              <Icon type="user" />
-              <span className="nav-text">nav 4</span>
-            </Menu.Item>
-          </Menu>
-      </AntdSider>
+      <aside className={classnames('sider', theme)}> 
+        <div className="logo">
+          <img src="https://t.alipayobjects.com/images/T1QUBfXo4fXXXXXXXX.png" alt="logo" type="image/x-icon"/>
+          <span>Jooger</span>
+        </div>
+        <Menus 
+          siderFold={ fold }
+          theme={ theme }
+          menuList={ menu }/>
+        {
+          !fold ? (
+            <div className="switchtheme">
+              <span><Icon type="bulb" />切换主题</span>
+              <Switch
+                defaultChecked={theme === 'light'}
+                checkedChildren={'Dark'}
+                unCheckedChildren={'Light'}
+                onChange={this.changeTheme}/>
+            </div>
+          ) : ''
+        }
+      </aside>
     )
   }
 }
 
-export default Sider
+const mapState2Props = (state) => {
+  return state.global.sider
+}
+
+const mapDispatch2Props = {
+  changeTheme,
+  toggleSider
+}
+
+export default connect(
+  mapState2Props,
+  mapDispatch2Props
+)(Sider)
