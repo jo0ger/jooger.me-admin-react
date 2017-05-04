@@ -9,7 +9,7 @@ module.exports = [
     name: '文章管理',
     icon: 'folder',
     clickable: false,
-    child: [
+    children: [
       {
         key: 'all',
         name: '全部文章',
@@ -36,6 +36,11 @@ module.exports = [
     key: 'music',
     name: '音乐管理',
     icon: 'customer-service'
+  },
+  {
+    key: 'project',
+    name: '项目管理',
+    icon: 'appstore'
   },
   {
     key: 'gallery',

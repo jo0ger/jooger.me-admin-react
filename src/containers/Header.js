@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Menu, Icon, Popover } from 'antd'
 
-import Menus from '~components/Menus'
+import Menus from '~components/common/Menus'
 
 import { menu } from '~config'
 import { toggleSider } from '~actions'

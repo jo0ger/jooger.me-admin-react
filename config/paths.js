@@ -85,5 +85,6 @@ module.exports = {
   srcReducers: resolveApp('src/store/reducers'),
   srcActions: resolveApp('src/store/actions'),
   srcConfig: resolveApp('src/config'),
-  srcUtils: resolveApp('src/utils')
+  srcUtils: resolveApp('src/utils'),
+  srcRoutes: resolveApp('src/routes')
 };

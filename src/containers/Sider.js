@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Icon, Switch } from 'antd'
-import Menus from '~components/Menus'
+import Menus from '~components/common/Menus'
 import { menu } from '~config'
 import { classnames } from '~utils'
 import {

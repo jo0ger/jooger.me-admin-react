@@ -7,14 +7,14 @@ const getMenus = (menuList = [], siderFold = false, parentPath = '/', topMenus =
   return menuList.map(item => {
     const linkTo = parentPath + item.key
     const hideText = siderFold && topMenus.indexOf(item.key) > -1
-    return item.child ? (
+    return item.children ? (
           <Menu.SubMenu
             key={ linkTo }
             title={ <span>
               { item.icon ? <Icon type={ item.icon } /> : '' }
               { hideText ? '' : <span>{ item.name }</span> }
             </span> }>
-            { getMenus(item.child, siderFold, `${linkTo}/`, topMenus) }
+            { getMenus(item.children, siderFold, `${linkTo}/`, topMenus) }
           </Menu.SubMenu>
         ) : (
           <Menu.Item key={ linkTo }>

@@ -5,6 +5,7 @@ import { Layout as AntdLayout } from 'antd'
 
 import Sider from './Sider'
 import Header from './Header'
+import Bread from '~components/common/Bread'
 import Footer from './Footer'
 
 import { debounce, classnames } from '~utils'
@@ -23,7 +24,7 @@ class Layout extends Component {
   componentWillMount () {
     this._windowResizeHandler = debounce(() => {
       this.props.toggleNavbar(document.body.clientWidth < 762)
-    }, 100)
+    }, 200)
     window.addEventListener('resize', this._windowResizeHandler, false)
   }
 
@@ -49,6 +50,7 @@ class Layout extends Component {
         }
         <div className="main">
           <Header />
+          <Bread />
           <div className="container">
             <div className="content">
               { this.props.children }

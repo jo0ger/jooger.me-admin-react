@@ -89,7 +89,8 @@ module.exports = {
       '~reducers': paths.srcReducers,
       '~actions': paths.srcActions,
       '~config': paths.srcConfig,
-      '~utils': paths.srcUtils
+      '~utils': paths.srcUtils,
+      '~routes': paths.srcRoutes
     }
   },
   
