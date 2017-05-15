@@ -29,12 +29,12 @@ var cli = useYarn ? 'yarn' : 'npm';
 var isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+if (!checkRequiredFiles([paths.appHtml, paths.appMainJs])) {
   process.exit(1);
 }
 
 // Tools like Cloud9 rely on this.
-var DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
+var DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3030;
 var compiler;
 var handleCompile;
 

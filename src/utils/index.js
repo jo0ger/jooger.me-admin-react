@@ -1,6 +1,6 @@
 import classnames from 'classnames'
 
-const debounce = (fn, delta = 0, immediate = false) => {
+export const debounce = (fn, delta = 0, immediate = false) => {
   let can = true
   let timer = null
   return function () {
@@ -12,29 +12,31 @@ const debounce = (fn, delta = 0, immediate = false) => {
       clearTimeout(timer)
       timer = setTimeout(() => {
         can = true
-      }, parseInt(delta))
+      }, parseInt(delta, 10))
     } else {
       clearTimeout(timer)
       timer = setTimeout(() => {
         fn.call(this, ...arguments)
-      }, parseInt(delta))
+      }, parseInt(delta, 10))
     }
   }
 }
 
 // 连字符转驼峰
-String.prototype.hyphenToHump = function () {
-  return this.replace(/-(\w)/g, (...args) => {
+export const hyphenToHump = (str = '') => {
+  return str.replace(/-(\w)/g, (...args) => {
     return args[1].toUpperCase()
   })
 }
 
 // 驼峰转连字符
-String.prototype.humpToHyphen = function () {
-  return this.replace(/([A-Z])/g, '-$1').toLowerCase()
+export const humpToHyphen = (str) => {
+  return str.replace(/([A-Z])/g, '-$1').toLowerCase()
 }
 
 module.exports = {
   classnames,
-  debounce
+  debounce,
+  hyphenToHump,
+  humpToHyphen
 }

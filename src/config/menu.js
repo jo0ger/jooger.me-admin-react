@@ -33,19 +33,27 @@ module.exports = [
     ],
   },
   {
-    key: 'music',
-    name: '音乐管理',
-    icon: 'customer-service'
-  },
-  {
-    key: 'project',
-    name: '项目管理',
-    icon: 'appstore'
-  },
-  {
-    key: 'gallery',
-    name: '图片管理',
-    icon: 'picture'
+    key: 'other',
+    name: '其他管理',
+    icon: 'appstore-o',
+    clickable: false,
+    children: [
+      {
+        key: 'music',
+        name: '音乐管理',
+        icon: 'customer-service'
+      },
+      {
+        key: 'project',
+        name: '项目管理',
+        icon: 'appstore'
+      },
+      {
+        key: 'gallery',
+        name: '图片管理',
+        icon: 'picture'
+      }
+    ]
   },
   {
     key: 'setting',

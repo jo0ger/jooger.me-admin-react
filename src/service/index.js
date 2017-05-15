@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { message } from 'antd'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -16,17 +17,18 @@ const code = {
 instance.interceptors.response.use(response => {
   if (!response || !response.data) {
     // TODO 提示服务器异常
+    message.error('服务器异常')
   }
   switch (response.data.code) {
     case code.UNAUTHORIZED:
-      // app.$notify.error('禁地勿闯！！！')
+      message.warning('禁地勿闯！！！')
       break
     case code.FAILED:
-      // app.$notify.error(response.data.message)
+      message.error(response.data.message)
       break
     case code.SUCCESS:
       if (response.config.method.toLocaleUpperCase() !== 'GET') {
-        // app.$notify.success(response.data.message)
+        message.success(response.data.message)
       }
       break
     default:
@@ -34,18 +36,21 @@ instance.interceptors.response.use(response => {
   }
   return response.data
 }, error => {
-  // let status = error.response.status
-  // app.$notify.error('请求错误' + (status ? `，code:${status}` : ''))
+  let status = error.response.status
+  message.error('请求错误' + (status ? `，code:${status}` : ''))
   return error.response
 })
 
-const wrap = (type, url) => (params = {}) => instance[type](url, { params })
+const wrap = (type, url) => (params = {}) => instance[type](url, params)
 
 const service = {
   auth: {
     login: wrap('post', '/auth'),
     getInfo: wrap('get', '/auth'),
     modifyInfo: wrap('put', '/auth')
+  },
+  stat: {
+    getStat: wrap('get', '/statistics')
   },
   article: {
     getList: wrap('get', '/article'),
@@ -54,6 +59,7 @@ const service = {
     batchDelete: wrap('delete', '/article'),
     getItem: id => wrap('get', `/article/${id}`),
     modifyItem: id => wrap('put', `/article/${id}`),
+    changeItemState: id => wrap('patch', `/article/${id}`),
     deleteItem: id => wrap('delete', `/article/${id}`)
   },
   category: {

@@ -1,10 +1,16 @@
 import { combineReducers } from 'redux'
-// import { routerReducer } from 'react-router-redux'
-import global from './global'
+import locationReducer from './location'
 
-const rootReducers = combineReducers({
-  global
-  // routing: routerReducer
-})
+export const makeRootReducer = (asyncReducers) => {
+  return combineReducers({
+    location: locationReducer,
+    ...asyncReducers
+  })
+}
 
-export default rootReducers
+export const injectReducer = (store, { key, reducer }) => {
+  store.asyncReducers[key] = reducer
+  store.replaceReducer(makeRootReducer(store.asyncReducers))
+}
+
+export default makeRootReducer
