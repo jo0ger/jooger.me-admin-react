@@ -3,8 +3,11 @@
 $header-padding       = $body-padding
 
 .g-header {
+  position: fixed;
+  z-index: $zindex-header;
+  width: 100%;
   border-bottom: 1px solid $grey-4;
-  box-shadow: $shadow-2
+  box-shadow: $shadow-2;
 
   :global {
     .ant-menu-horizontal {

@@ -3,6 +3,6 @@ import zenReducer from './modules/zen'
 import loadZenContainer from 'bundle-loader?lazy!./containers/ZenContainer'
 
 export default (store) => {
-  injectReducer(store, { key: 'zen', reducer: zenReducer })
+  injectReducer(store, { name: 'zen', reducer: zenReducer })
   return loadZenContainer
 }

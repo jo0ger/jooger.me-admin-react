@@ -8,8 +8,8 @@ export const makeRootReducer = (asyncReducers) => {
   })
 }
 
-export const injectReducer = (store, { key, reducer }) => {
-  store.asyncReducers[key] = reducer
+export const injectReducer = (store, { name, reducer }) => {
+  store.asyncReducers[name] = reducer
   store.replaceReducer(makeRootReducer(store.asyncReducers))
 }
 

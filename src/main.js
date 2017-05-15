@@ -15,6 +15,7 @@ const renderApp = (DevTools = null) => {
     const DevTools = require('~components/DevTools').default
     render(
       <AppContainer store={store} routes={routes}>
+        <DevTools />
       </AppContainer>,
       MOUNT_NODE
     )

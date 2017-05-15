@@ -1,12 +1,13 @@
 @import '../../styles/vars/index'
 
-$bread-margin         = $body-padding / 2
+$bread-margin         = $body-padding
 $bread-padding        = $body-padding
 
 .bread {
   height: 48px;
   line-height: 48px;
-  margin-bottom: (0 - $bread-margin);
+  margin-top: $bread-margin
+  margin-bottom: (0 - $bread-margin / 2);
   padding: 0 $bread-padding;
 
   i {

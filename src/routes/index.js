@@ -1,6 +1,7 @@
 import React from 'react'
 import Bundle from '~components/Bundle'
 import AppLayout from '~layouts/AppLayout'
+import { AllArticles } from './Article'
 import Home from './Home'
 import CounterRoute from './Counter'
 import ZenRoute from './Zen'
@@ -22,9 +23,15 @@ export const createRoutes = store => {
       {
         redirect: {
           from: '/',
-          to: '/home',
+          to: '/dashboard',
           push: false
         }
+      },
+      {
+        path: '/article/all',
+        name: 'allArticles',
+        component: bundleAsyncRoute(AllArticles(store)),
+        exact: true
       },
       {
         path: '/home',

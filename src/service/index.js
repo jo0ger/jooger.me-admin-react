@@ -43,7 +43,7 @@ instance.interceptors.response.use(response => {
 
 const wrap = (type, url) => (params = {}) => instance[type](url, params)
 
-const service = {
+const Service = {
   auth: {
     login: wrap('post', '/auth'),
     getInfo: wrap('get', '/auth'),
@@ -85,4 +85,4 @@ const service = {
   }
 }
 
-export default service
+export default Service
