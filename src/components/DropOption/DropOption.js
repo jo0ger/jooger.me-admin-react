@@ -10,7 +10,6 @@ const DropOption = ({ menuText = '', onMenuClick, menuOptions = [], buttonStyle 
     {...dropdownProps}
     >
     <Button style={{ border: 'none', ...buttonStyle }}>
-      <Icon style={{ marginRight: 2 }} type="bars" />
       {menuText}
       <Icon type="down" />
     </Button>

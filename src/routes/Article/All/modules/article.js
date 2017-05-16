@@ -40,9 +40,11 @@ export const fetchList = (params = {}, filter = {}, sorter = {}, refresh = true)
       // 请求成功
       dispatch(requestListSuccess(data, filter, sorter, refresh))
     }
+    return code
   }).catch(err => {
     // 请求失败
     dispatch(requestListFailure(err))
+    return err
   })
 }
 
@@ -70,7 +72,7 @@ export const editArticleFailure = (err) => ({
 // 分两种
 // 1. 批量状态修改 （只是article的状态）
 // 2. 单篇内容修改 （包含article其他内容，不仅是状态）
-export const editArticle = (params = {}, index) => (dispatch, getState) => {
+export const editArticle = (params = {}, id, index) => (dispatch, getState) => {
   if (getState().article.list.editing) {
     return
   }
@@ -90,11 +92,63 @@ export const editArticle = (params = {}, index) => (dispatch, getState) => {
     }).catch(err => dispatch(editArticleFailure(err)))
   }
   // 单篇文章内容修改
-  return Service.article.modifyItem({ params }).then(({ code, data }) => {
+  return Service.article.modifyItem(id)({ params }).then(({ code, data }) => {
     if (!code) {
       dispatch(editArticleSuccess({ data, index }))
     }
   }).catch(err => dispatch(editArticleFailure(err)))
+}
+
+// ------------------------------------
+// Article Item 删除
+// ------------------------------------
+export const DELETE_ARTICLE_ITEM_REQUEST = 'DELETE_ARTICLE_ITEM_REQUEST'
+export const DELETE_ARTICLE_ITEM_SUCCESS = 'DELETE_ARTICLE_ITEM_SUCCESS'
+export const DELETE_ARTICLE_ITEM_FAILURE = 'DELETE_ARTICLE_ITEM_FAILURE'
+
+export const deleteArticleRequest = () => ({
+  type: DELETE_ARTICLE_ITEM_REQUEST
+})
+
+export const deleteArticleFailure = err => ({
+  type: DELETE_ARTICLE_ITEM_FAILURE,
+  payload: err
+})
+
+export const deleteArticleSuccess = ({index, isBatch = false, indexes}) => ({
+  type: DELETE_ARTICLE_ITEM_SUCCESS,
+  payload: { index, isBatch, indexes }
+})
+
+// 包含 1. 单篇删除   2. 批量删除
+// 但是目前只用到了2，因为其实就是将单篇的id包装成一个数组而已
+// 目前未找到用1的场景，但这里先写下了
+export const deleteArticle = (params = {}, id, index) => (dispatch, getState) => {
+  if (getState().article.list.deleting) {
+    return
+  }
+  dispatch(deleteArticleRequest())
+  const { article_ids } = params
+  if (article_ids) {
+    // 批量删除
+    const { indexes } = params
+    return Service.article.batchDelete({ data: {article_ids} }).then(({code}) => {
+      if (!code) {
+        dispatch(deleteArticleSuccess({
+          indexes,
+          isBatch: true
+        }))
+      }
+      return code
+    }).catch(err => dispatch(deleteArticleFailure(err)))
+  }
+  // 单篇文章删除
+  return Service.article.deleteItem(id)(params).then(code => {
+    if (!code) {
+      dispatch(deleteArticleSuccess({ index }))
+    }
+    return code
+  }).catch(err => dispatch(deleteArticleFailure(err)))
 }
 
 
@@ -137,7 +191,7 @@ const ACTION_HANDLERS = {
     if (isBatch) {
       // 批量修改状态
       indexes.forEach((item, index) => {
-        articleList[index].state = status
+        articleList[item].state = status
       })
     } else {
       // 单篇内容修改
@@ -156,7 +210,38 @@ const ACTION_HANDLERS = {
       ...state.list,
       editing: false
     }
-  })
+  }),
+  [DELETE_ARTICLE_ITEM_REQUEST]: state => ({
+    list: {
+      ...state.list,
+      deleting: true
+    }
+  }),
+  [DELETE_ARTICLE_ITEM_FAILURE]: state => ({
+    list: {
+      ...state.list,
+      deleting: false
+    }
+  }),
+  [DELETE_ARTICLE_ITEM_SUCCESS]: (state, { index, isBatch, indexes }) => {
+    let articleList = [...state.list.data]
+    if (isBatch) {
+      // 批量修改状态
+      articleList = [...state.list.data].filter((item, index) => {
+        return !indexes.includes(index)
+      })
+    } else {
+      // 单篇内容修改
+      articleList.splice(index, 1)
+    }
+    return {
+      list: {
+        ...state.list,
+        deleting: false,
+        data: articleList
+      }
+    }
+  }
 }
 
 // ------------------------------------
@@ -166,6 +251,7 @@ const initialState = {
   list: {
     fetching: false,    // 列表获取状态
     editing: false,     // 列表编辑状态
+    deleting: false,    // 列表删除状态
     data: [],           // 列表LIST
     pagination: {},     // 列表分页信息
     filter: {},         // 列表过滤信息

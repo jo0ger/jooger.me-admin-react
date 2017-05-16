@@ -1,18 +1,14 @@
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import { fetchList, editArticle } from '../modules/article'
 import AllArticles from '../components/AllArticles'
 
 const mapState2Props = state => {
-  const { fetching, editing, data, pagination, filter, sorter } = state.article.list
-  console.log(state.article.list)
+  const { data, filter, sorter, pagination } = state.article.list
   return {
-    listFetching: fetching,
-    listEditing: editing,
     articleList: data,
-    pagination,
     filter,
-    sorter
+    sorter,
+    pagination
   }
 }
 
@@ -21,4 +17,4 @@ const mapDispatch2Props = {
   editArticle
 }
 
-export default connect(mapState2Props, mapDispatch2Props)(withRouter(AllArticles))
+export default connect(mapState2Props, mapDispatch2Props)(AllArticles)

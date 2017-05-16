@@ -1,28 +1,39 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card } from 'antd'
-import ArticleList from './ArticleList'
+import { Card, Tag } from 'antd'
+import ArticleList from '../containers/ArticleListContainer'
 import styles from '../assets/allArticle'
 
 export class AllArticles extends Component {
   
   static propTypes = {
-    history: PropTypes.object.isRequired,
-    listFetching: PropTypes.bool.isRequired,      // 文章请求状态
-    listEditing: PropTypes.bool.isRequired,       // 文章编辑状态
     articleList: PropTypes.array.isRequired,      // 文章列表
-    pagination: PropTypes.object.isRequired,      // 分页信息,
-    filter: PropTypes.object.isRequired,          // 分页过滤,
+    filter: PropTypes.object.isRequired,
+    sorter: PropTypes.object.isRequired,
+    pagination: PropTypes.object.isRequired,      // 文章分页信息
     fetchArticleList: PropTypes.func.isRequired,  // 文章获取方法
     editArticle: PropTypes.func.isRequired        // 文章修改状态方法
   }
 
   state = {
-    selectedList: []       // 批量选中的文章ID
+    selectedList: []              // 批量选中的文章ID
   }
 
   componentWillMount () {
     this._init()
+  }
+
+  componentWillUnmount () {
+    const { sorter, filter, fetchArticleList } = this.props
+    const { state } = filter
+    const params = { page: 1 }
+    if (state && state.length) {
+      params.state = state[0]
+    }
+    if (sorter && sorter.field) {
+      params.sort = { [sorter.field]: sorter.order === 'descend' ? -1 : 1 }
+    }
+    fetchArticleList(params, filter, sorter)
   }
 
   _init () {
@@ -43,7 +54,7 @@ export class AllArticles extends Component {
   }
 
   _deleteArticle (ids, indexes) {
-
+    
   }
 
   // 单选
@@ -58,61 +69,16 @@ export class AllArticles extends Component {
     })
   }
 
-  // filter和sorter变化
-  handleTableChange = (pagination, filters, sorter) => {
-    const { state } = filters
-    const params = { page : pagination.current }
-    if (state && state.length) {
-      params.state = state[0]
-    }
-    if (sorter && sorter.field) {
-      params.sort = { [sorter.field]: sorter.order === 'descend' ? -1 : 1 }
-    }
-    this.props.fetchArticleList(params, filters, sorter)
-  }
-
-  // 文章操作
-  handleTableOperate = (id, index, type) => {
-    switch (type) {
-      case 'edit':
-        this.props.history.push(`/article/edit/${id}`)
-        break;
-      case 'publish':
-        this._editArticleState([id], [index], 1)
-        break
-      case 'moveDraft':
-        this._editArticleState([id], [index], 0)
-        break
-      case 'moveRecycle':
-        this._editArticleState([id], [index], -1)
-        break
-      case 'delete':
-        this._deleteArticle([id], index)
-        break
-      default:
-        break;
-    }
-  }
-
   render () {
-    const { articleList, pagination, filter, sorter, listFetching, listEditing } = this.props
     const listProps = {
-      articleList,
-      pagination,
-      filter,
-      sorter,
-      listFetching,
-      listEditing,
       onSelect: this.handleTableSelect,
-      onSelectAll: this.handleTableSelectAll,
-      onOperate: this.handleTableOperate,
-      onChange: this.handleTableChange
+      onSelectAll: this.handleTableSelectAll
     }
 
     return (
       <Card
         className={styles['page-articles']}
-        title={<h2>全部文章</h2>}
+        title={<h4>共<Tag color="blue" className={styles['article-count']}>{ this.props.pagination.total || 0 }</Tag>篇文章</h4>}
       >
         <ArticleList {...listProps} />
       </Card>
