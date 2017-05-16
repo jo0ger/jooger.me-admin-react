@@ -15,9 +15,9 @@ export const requestList = () => ({
 })
 
 // list请求成功
-export const requestListSuccess = (data, refresh) => ({
+export const requestListSuccess = (data, filter, sorter, refresh) => ({
   type: FETCH_ARTICLE_LIST_SUCCESS,
-  payload: { ...data, refresh }
+  payload: { ...data, filter, sorter, refresh }
 })
 
 // list请求失败
@@ -28,7 +28,7 @@ export const requestListFailure = err => ({
 
 // 请求
 // refresh 是否刷新列表 default: false
-export const fetchList = (params = {}, refresh = true) => (dispatch, getState) => {
+export const fetchList = (params = {}, filter = {}, sorter = {}, refresh = true) => (dispatch, getState) => {
   if (getState().article.list.fetching) {
     // TODO 提示 请勿频繁操作？？？
     return
@@ -38,7 +38,7 @@ export const fetchList = (params = {}, refresh = true) => (dispatch, getState) =
   return Service.article.getList({ params }).then(({ code, data }) => {
     if (!code) {
       // 请求成功
-      dispatch(requestListSuccess(data, refresh))
+      dispatch(requestListSuccess(data, filter, sorter, refresh))
     }
   }).catch(err => {
     // 请求失败
@@ -68,17 +68,18 @@ export const editArticleFailure = (err) => ({
 })
 
 // 分两种
-// 1. 批量状态修改 （article的状态）
-// 2. 单篇内容修改
+// 1. 批量状态修改 （只是article的状态）
+// 2. 单篇内容修改 （包含article其他内容，不仅是状态）
 export const editArticle = (params = {}, index) => (dispatch, getState) => {
   if (getState().article.list.editing) {
     return
   }
   dispatch(editArticleRequest())
-  if (params.article_ids) {
+  const { article_ids } = params
+  if (article_ids) {
     const { indexes, state } = params
     // 批量修改 type: PATCH
-    return Service.article.batchUpdate({ params }).then(({ code, data }) => {
+    return Service.article.batchUpdate({ article_ids, state }).then(({ code, data }) => {
       if (!code) {
         dispatch(editArticleSuccess({
           isBatch: true,
@@ -88,6 +89,7 @@ export const editArticle = (params = {}, index) => (dispatch, getState) => {
       }
     }).catch(err => dispatch(editArticleFailure(err)))
   }
+  // 单篇文章内容修改
   return Service.article.modifyItem({ params }).then(({ code, data }) => {
     if (!code) {
       dispatch(editArticleSuccess({ data, index }))
@@ -106,13 +108,15 @@ const ACTION_HANDLERS = {
       fetching: true
     }
   }),
-  [FETCH_ARTICLE_LIST_SUCCESS]: (state, { list, pagination, refresh }) => {
+  [FETCH_ARTICLE_LIST_SUCCESS]: (state, { list, pagination, filter, sorter, refresh }) => {
     return {
       list: {
         ...state.list,
         fetching: false,
         data: refresh ? [...list] : [...state.list.data, ...list],
-        pagination
+        pagination,
+        filter,
+        sorter
       }
     }
   },
@@ -129,20 +133,22 @@ const ACTION_HANDLERS = {
     }
   }),
   [EDIT_ARTICLE_ITEM_SUCCESS]: (state, { data, index, isBatch, indexes, status }) => {
-    const articleList = [...state.article.list.data]
+    const articleList = [...state.list.data]
     if (isBatch) {
       // 批量修改状态
       indexes.forEach((item, index) => {
-        articleList.state = status
+        articleList[index].state = status
       })
     } else {
       // 单篇内容修改
       articleList.splice(index, 1, data)
     }
     return {
-      ...state.article.list,
+      list: {
+        ...state.list,
         editing: false,
         data: articleList
+      }
     }
   },
   [EDIT_ARTICLE_ITEM_FAILURE]: (state, err) => ({
@@ -158,10 +164,12 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 const initialState = {
   list: {
-    fetching: false,
-    editing: false,
-    data: [],
-    pagination: {}
+    fetching: false,    // 列表获取状态
+    editing: false,     // 列表编辑状态
+    data: [],           // 列表LIST
+    pagination: {},     // 列表分页信息
+    filter: {},         // 列表过滤信息
+    sorter: {}
   }
 }
 export default function articleReducer (state = initialState, action) {

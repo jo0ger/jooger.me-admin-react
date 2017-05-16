@@ -56,7 +56,7 @@ const getComputedList = (articleList = []) => articleList.map(item => ({
   key: item._id
 }))
 
-const getListColumn = (onOperate) => ([
+const getListColumn = (filter, sorter, onOperate) => ([
   {
     title: '日期',
     dataIndex: 'create_at',
@@ -100,22 +100,43 @@ const getListColumn = (onOperate) => ([
     title: '状态',
     dataIndex: 'state',
     filters: [
-      { text: 'Published', value: 1 },
-      { text: 'Draft', value: 0 },
-      { text: 'Deleted', value: -1 }
+      { text: <Badge status="success" text="Published" />, value: 1 },
+      { text: <Badge status="warning" text="Drafted" />, value: 0 },
+      { text: <Badge status="error" text="Deleted" />, value: -1 }
     ],
     filterMultiple: false,
     filtered: true,
+    filteredValue: filter.state,
     width: 150,
     render: state => {
-      const status = state === 1 ? 'success' : (
-        state === 0 ? 'warning' : 'error'
-      )
-      const text = state === 1 ? 'Published' : (
-        state === 0 ? 'Draft' : 'Deleted'
-      )
+      const [status, text] = state === 1
+        ? ['success', 'Published']
+        : (
+          state === 0 ? ['warning', 'Drafted'] : ['error', 'Deleted']
+        )
       return <Badge status={status} text={text} />
     }
+  },
+  {
+    title: 'PV',
+    dataIndex: 'meta.visit',
+    sorter: true,
+    sortOrder: sorter.columnKey === 'meta.visit' ? sorter.order : false,
+    render: count => count
+  },
+  {
+    title: '赞数',
+    dataIndex: 'meta.likes',
+    sorter: true,
+    sortOrder: sorter.columnKey === 'meta.likes' ? sorter.order : false,
+    render: count => count
+  },
+  {
+    title: '评论',
+    dataIndex: 'meta.comments',
+    sorter: true,
+    sortOrder: sorter.columnKey === 'meta.comments' ? sorter.order : false,
+    render: count => count
   },
   {
     title: '操作',
@@ -129,7 +150,7 @@ const getListColumn = (onOperate) => ([
 ])
 
 export const ArticleList = (props) => {
-  const { articleList, pagination, listFetching, onChange, onOperate, onSelect, onSelectAll } = props
+  const { articleList, pagination, filter, sorter, listFetching, listEditing, onChange, onOperate, onSelect, onSelectAll } = props
   const { total, current_page, per_page } = pagination
   
   const computedPagination = {
@@ -141,9 +162,9 @@ export const ArticleList = (props) => {
   return (
     <div className={styles['article-list']}>
       <Table
-        loading={listFetching}
+        loading={listFetching || listEditing}
         dataSource={getComputedList(articleList)}
-        columns={getListColumn(onOperate)}
+        columns={getListColumn(filter, sorter, onOperate)}
         pagination={computedPagination}
         onChange={onChange}
         rowSelection={{ onSelect, onSelectAll }}
@@ -154,8 +175,11 @@ export const ArticleList = (props) => {
 
 ArticleList.propTypes = {
   listFetching: PropTypes.bool.isRequired,
+  listEditing: PropTypes.bool.isRequired,
   articleList: PropTypes.array.isRequired,
   pagination: PropTypes.object.isRequired,
+  filter: PropTypes.object.isRequired,
+  sorter: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   onOperate: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
