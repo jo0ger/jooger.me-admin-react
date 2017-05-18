@@ -29,6 +29,12 @@ module.exports = [
         key: 'publish',
         name: '发布文章',
         icon: 'file-add',
+      },
+      {
+        key: 'detail',
+        name: '文章详情',
+        icon: 'file-text',
+        hidden: true
       }
     ],
   },

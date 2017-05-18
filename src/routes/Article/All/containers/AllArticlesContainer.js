@@ -1,9 +1,9 @@
 import { connect } from 'react-redux'
-import { fetchList, editArticle } from '../modules/article'
+import { fetchList, editArticle } from '../modules/articleList'
 import AllArticles from '../components/AllArticles'
 
 const mapState2Props = state => {
-  const { data, filter, sorter, pagination } = state.article.list
+  const { data, filter, sorter, pagination } = state.articleList
   return {
     articleList: data,
     filter,

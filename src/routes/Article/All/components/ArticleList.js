@@ -80,14 +80,18 @@ const getListColumn = ctx => {
       dataIndex: 'create_at',
       key: 'create_at',
       width: 150,
-      render: date => <span>{ fmtDate(date) }</span>  
+      render: date => <span>{ fmtDate(date) }</span>
     },
     {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
       width: 350,
-      render: title => <h4>{ title }</h4>
+      render: (title, record) => (
+        <Link to={`/article/detail/${record._id}`}>
+          <h4>{ title }</h4>
+        </Link>
+      )
     },
     {
       title: '分类',
@@ -163,7 +167,7 @@ const getListColumn = ctx => {
       ],
       filterMultiple: false,
       filtered: true,
-      filteredValue: filter.state,
+      filteredValue: filter.state || [],
       width: 150,
       render: state => {
         const [status, text] = state === 1
@@ -246,12 +250,26 @@ const getExcerptRow = row => <p><strong>摘要：&nbsp;&nbsp;</strong>{ row.exce
 const getPaginationTotal = (total, range) => `共 ${total} 篇文章，当前 ${range[0]}-${range[1]} `
 
 // 获取Table的Title
-const batchMenuOptions = noSelected => [
+const batchMenuOptions = (noSelected) => [
   { key: 'batchPublish', name: '批量发布', props: { disabled: noSelected } },
   { key: 'batchDraft', name: '批量草稿', props: { disabled: noSelected } },
   { key: 'batchRecycle', name: '批量回收', props: { disabled: noSelected } }
 ]
-const getTableTitle = (currentPageData, selectedList = [], onOperate = function () {}) => {
+
+const noop = function () {}
+
+const getTableTitle = ({
+  currentPageData,
+  selectedList = [],
+  onOperate = noop,
+  onSearch = noop,
+  onInputChange = noop,
+  searchKeyword = '',
+  deleting,
+  editing,
+  refreshing,
+  onRefresh = noop
+}) => {
   const noSelected = selectedList.length < 1
   return (
     <div className={styles['list-title']}>
@@ -272,14 +290,17 @@ const getTableTitle = (currentPageData, selectedList = [], onOperate = function 
           okText="是"
           cancelText="否"
         >
-          <Button type="danger" disabled={noSelected}>批量删除</Button>
+          <Button type="danger" icon="delete" loading={deleting} disabled={noSelected}>批量删除</Button>
         </Popconfirm>
+        <Button type="primary" icon="reload" loading={refreshing} onClick={onRefresh}>刷新</Button>
       </div>
       <div className={styles['title-search']}>
         <Search
           placeholder="搜索标题或者摘要"
+          value={searchKeyword}
           style={{ width: 200 }}
-          onSearch={value => console.log(value)}
+          onChange={e => onInputChange(e.target.value)}
+          onSearch={value => onSearch(value.trim())}
         />
       </div>
     </div>
@@ -299,7 +320,9 @@ export class ArticleList extends PureComponent {
         filterDropdownVisible: false
       }
     },
-    selectedList: []                    // 批量选中的文章ID
+    selectedList: [],                    // 批量选中的文章ID
+    searchKeyword: '',
+    refreshing: false
   }
 
   // 编辑文章状态（单篇 || 批量）
@@ -327,6 +350,24 @@ export class ArticleList extends PureComponent {
         }
         fetchArticleList(params, filter, sorter)
       }
+    })
+  }
+
+  _clearState () {
+    this.setState({
+      model: {
+        category: {
+          query: '',
+          filterDropdownVisible: false
+        },
+        tag: {
+          query: '',
+          filterDropdownVisible: false
+        }
+      },
+      selectedList: [],
+      searchKeyword: '',
+      refreshing: false
     })
   }
 
@@ -424,11 +465,43 @@ export class ArticleList extends PureComponent {
 
   // 行选择
   handleTableSelectChange = (selectedRowKeys, selectedRows) => {
-    console.log(selectedRowKeys, selectedRows)
     this.setState({ selectedList: selectedRowKeys })
   }
 
+  handleSearchInputChange = value => {
+    this.setState({
+      searchKeyword: value
+    })
+  }
+
+  // 处理Title上的搜索
+  handleInputSearch = value => {
+    // 清空所有搜索信息
+    this._clearState()
+    this.setState({
+      searchKeyword: value
+    })
+    const params = { page: 1 }
+    if (value) {
+      params.keyword = value
+    }
+    this.props.fetchArticleList(params)
+  }
+
+  handleRefresh = () => {
+    this._clearState()
+    this.setState({
+      refreshing: true
+    })
+    this.props.fetchArticleList({ page: 1 }).then(code => {
+      this.setState({
+        refreshing: false
+      })
+    })
+  }
+
   render () {
+    const { selectedList, refreshing, searchKeyword } = this.state
     const { articleList, pagination, listFetching, listEditing, listDeleting } = this.props
     const { total, current_page, per_page } = pagination
     
@@ -447,7 +520,18 @@ export class ArticleList extends PureComponent {
       <div className={styles['article-list']}>
         <Table
           selectedRowKeys={[1,2,3,4,5,6,7,8,9,10]}
-          title={(currentPageData) => getTableTitle(currentPageData, this.state.selectedList, this.handleBatchOperate)}
+          title={(currentPageData) => getTableTitle({
+            currentPageData,
+            selectedList: selectedList,
+            onOperate: this.handleBatchOperate,
+            onSearch: this.handleInputSearch,
+            searchKeyword: searchKeyword,
+            onInputChange: this.handleSearchInputChange,
+            refreshing: refreshing,
+            editing: listEditing,
+            deleting: listDeleting,
+            onRefresh: this.handleRefresh
+          })}
           loading={listFetching || listEditing || listDeleting}
           dataSource={getComputedList(articleList)}
           columns={getListColumn(this)}

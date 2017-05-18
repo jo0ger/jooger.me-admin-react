@@ -23,6 +23,7 @@ const getMenus = (menuList = [], parentPath = '/') => {
         { getMenus(item.children, `${linkTo}/`) }
       </SubMenu>
     ) : (
+      item.hidden ? null :
       <MenuItem key={ linkTo }>
         <NavLink to={ linkTo } activeClassName="route--active">
           { item.icon ? <Icon type={ item.icon } /> : '' }

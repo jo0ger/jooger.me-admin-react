@@ -1,7 +1,7 @@
 import React from 'react'
 import Bundle from '~components/Bundle'
 import AppLayout from '~layouts/AppLayout'
-import { AllArticles } from './Article'
+import { AllArticles, ArticleDetail } from './Article'
 import Home from './Home'
 import CounterRoute from './Counter'
 import ZenRoute from './Zen'
@@ -31,6 +31,12 @@ export const createRoutes = store => {
         path: '/article/all',
         name: 'allArticles',
         component: bundleAsyncRoute(AllArticles(store)),
+        exact: true
+      },
+      {
+        path: '/article/detail/:id',
+        name: 'articleDetail',
+        component: bundleAsyncRoute(ArticleDetail(store)),
         exact: true
       },
       {

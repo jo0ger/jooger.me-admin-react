@@ -29,7 +29,7 @@ export const requestListFailure = err => ({
 // 请求
 // refresh 是否刷新列表 default: false
 export const fetchList = (params = {}, filter = {}, sorter = {}, refresh = true) => (dispatch, getState) => {
-  if (getState().article.list.fetching) {
+  if (getState().articleList.fetching) {
     // TODO 提示 请勿频繁操作？？？
     return
   }
@@ -73,7 +73,7 @@ export const editArticleFailure = (err) => ({
 // 1. 批量状态修改 （只是article的状态）
 // 2. 单篇内容修改 （包含article其他内容，不仅是状态）
 export const editArticle = (params = {}, id, index) => (dispatch, getState) => {
-  if (getState().article.list.editing) {
+  if (getState().articleList.editing) {
     return
   }
   dispatch(editArticleRequest())
@@ -124,7 +124,7 @@ export const deleteArticleSuccess = ({index, isBatch = false, indexes}) => ({
 // 但是目前只用到了2，因为其实就是将单篇的id包装成一个数组而已
 // 目前未找到用1的场景，但这里先写下了
 export const deleteArticle = (params = {}, id, index) => (dispatch, getState) => {
-  if (getState().article.list.deleting) {
+  if (getState().articleList.deleting) {
     return
   }
   dispatch(deleteArticleRequest())
@@ -151,43 +151,34 @@ export const deleteArticle = (params = {}, id, index) => (dispatch, getState) =>
   }).catch(err => dispatch(deleteArticleFailure(err)))
 }
 
-
 // ------------------------------------
 // ACTION HANDLERS
 // ------------------------------------
 const ACTION_HANDLERS = {
   [FETCH_ARTICLE_LIST_REQUEST]: state => ({
-    list: {
-      ...state.list,
-      fetching: true
-    }
+    ...state,
+    fetching: true
   }),
   [FETCH_ARTICLE_LIST_SUCCESS]: (state, { list, pagination, filter, sorter, refresh }) => {
     return {
-      list: {
-        ...state.list,
-        fetching: false,
-        data: refresh ? [...list] : [...state.list.data, ...list],
-        pagination,
-        filter,
-        sorter
-      }
+      ...state,
+      fetching: false,
+      data: refresh ? [...list] : [...state.data, ...list],
+      pagination,
+      filter,
+      sorter
     }
   },
   [FETCH_ARTICLE_LIST_FAILURE]: (state, err) => ({
-    list: {
-      ...state.list,
-      fetching: false
-    }
+    ...state,
+    fetching: false
   }),
   [EDIT_ARTICLE_ITEM_REQUEST]: state => ({
-    list: {
-      ...state.list,
-      editing: true
-    }
+    ...state,
+    editing: true
   }),
   [EDIT_ARTICLE_ITEM_SUCCESS]: (state, { data, index, isBatch, indexes, status }) => {
-    const articleList = [...state.list.data]
+    const articleList = [...state.data]
     if (isBatch) {
       // 批量修改状态
       indexes.forEach((item, index) => {
@@ -198,36 +189,28 @@ const ACTION_HANDLERS = {
       articleList.splice(index, 1, data)
     }
     return {
-      list: {
-        ...state.list,
-        editing: false,
-        data: articleList
-      }
+      ...state,
+      editing: false,
+      data: articleList
     }
   },
   [EDIT_ARTICLE_ITEM_FAILURE]: (state, err) => ({
-    list: {
-      ...state.list,
-      editing: false
-    }
+    ...state,
+    editing: false
   }),
   [DELETE_ARTICLE_ITEM_REQUEST]: state => ({
-    list: {
-      ...state.list,
-      deleting: true
-    }
+    ...state,
+    deleting: true
   }),
   [DELETE_ARTICLE_ITEM_FAILURE]: state => ({
-    list: {
-      ...state.list,
-      deleting: false
-    }
+    ...state,
+    deleting: false
   }),
   [DELETE_ARTICLE_ITEM_SUCCESS]: (state, { index, isBatch, indexes }) => {
-    let articleList = [...state.list.data]
+    let articleList = [...state.data]
     if (isBatch) {
       // 批量修改状态
-      articleList = [...state.list.data].filter((item, index) => {
+      articleList = [...state.data].filter((item, index) => {
         return !indexes.includes(index)
       })
     } else {
@@ -235,11 +218,9 @@ const ACTION_HANDLERS = {
       articleList.splice(index, 1)
     }
     return {
-      list: {
-        ...state.list,
-        deleting: false,
-        data: articleList
-      }
+      ...state,
+      deleting: false,
+      data: articleList
     }
   }
 }
@@ -248,15 +229,13 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  list: {
-    fetching: false,    // 列表获取状态
-    editing: false,     // 列表编辑状态
-    deleting: false,    // 列表删除状态
-    data: [],           // 列表LIST
-    pagination: {},     // 列表分页信息
-    filter: {},         // 列表过滤信息
-    sorter: {}
-  }
+  fetching: false,    // 列表获取状态
+  editing: false,     // 列表编辑状态
+  deleting: false,    // 列表删除状态
+  data: [],           // 列表LIST
+  pagination: {},     // 列表分页信息
+  filter: {},         // 列表过滤信息
+  sorter: {}
 }
 export default function articleReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
