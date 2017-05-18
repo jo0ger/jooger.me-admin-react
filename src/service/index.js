@@ -3,7 +3,7 @@ import { message } from 'antd'
 
 const isProd = process.env.NODE_ENV === 'production'
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: !isProd ? 'http://localhost:5000/v1' : 'http://api.jooger.com/v1',
   timeout: 5000
 })

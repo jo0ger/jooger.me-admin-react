@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Dropdown, Button, Icon, Menu } from 'antd'
 
 const DropOption = ({ menuText = '', onMenuClick, menuOptions = [], buttonStyle = {}, dropdownProps = {} }) => {
-  const menu = menuOptions.map(item => <Menu.Item key={item.key}>{item.name}</Menu.Item>)
+  const menu = menuOptions.map(item => <Menu.Item {...item.props} key={item.key}>{item.name}</Menu.Item>)
   return (
     <Dropdown
     overlay={<Menu onClick={onMenuClick}>{menu}</Menu>}

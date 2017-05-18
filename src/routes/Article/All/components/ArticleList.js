@@ -6,8 +6,10 @@ import DropOption from '~components/DropOption'
 import { fmtDate } from '~utils'
 import styles from '../assets/allArticle'
 
+const Search = Input.Search
+
 // 获取表格每行操作栏的action button
-const getActionBtn = (text, record, index, onOperate = null) => {
+const getActionBtn = (text, record, index, onOperate = function () {}) => {
   let { state } = record
   let allMenuOptions = [
     { key: 'publish', name: '发布文章' },
@@ -65,12 +67,12 @@ const getListColumn = ctx => {
     props: { filter, sorter },
     state: { model: { category, tag } },
     handleFilterDropdownVisibleChange,
-    handleSearchInputChange,
-    handleInputSearch
+    handleFilterSearchInputChange,
+    handleFilterInputSearch
   } = ctx
   const onOperate = ctx.handleTableOperate
-  const onCategorySearch = () => handleInputSearch('category')
-  const onTagSearch = () => handleInputSearch('tag')
+  const onCategorySearch = () => handleFilterInputSearch('category')
+  const onTagSearch = () => handleFilterInputSearch('tag')
 
   return ([
     {
@@ -98,10 +100,11 @@ const getListColumn = ctx => {
             ref={ele => ctx.categorySearchInput = ele}
             placeholder="Search name"
             value={category.query}
-            onChange={e => handleSearchInputChange(e.target.value, 'category')}
+            onChange={e => handleFilterSearchInputChange(e.target.value, 'category')}
             onPressEnter={onCategorySearch}
           />
-          <Button type="primary" onClick={onCategorySearch} >Search</Button>
+          <Button type="primary" style={{marginRight: '5px'}} onClick={onCategorySearch} >搜索</Button>
+          <Button onClick={() => handleFilterSearchInputChange('', 'category')}>重置</Button>
         </div>
       ),
       filtered: true,
@@ -124,10 +127,11 @@ const getListColumn = ctx => {
             ref={ele => ctx.tagSearchInput = ele}
             placeholder="Search name"
             value={tag.query}
-            onChange={e => handleSearchInputChange(e.target.value, 'tag')}
+            onChange={e => handleFilterSearchInputChange(e.target.value, 'tag')}
             onPressEnter={onTagSearch}
           />
-          <Button type="primary" onClick={onTagSearch} >Search</Button>
+          <Button type="primary" style={{marginRight: '5px'}} onClick={onTagSearch} >搜索</Button>
+          <Button onClick={() => handleFilterSearchInputChange('', 'tag')}>重置</Button>
         </div>
       ),
       filtered: true,
@@ -235,7 +239,52 @@ const getParamsByModel = (model = []) => {
 }
 
 // 获取文章摘要折叠行
-const getExcerptRow = row => <p><strong>摘要：&nbsp;&nbsp;</strong>{ row.excerpt }</p>
+const NO_EXCERPT = '--'
+const getExcerptRow = row => <p><strong>摘要：&nbsp;&nbsp;</strong>{ row.excerpt || NO_EXCERPT }</p>
+
+// 获取分页总条目数
+const getPaginationTotal = (total, range) => `共 ${total} 篇文章，当前 ${range[0]}-${range[1]} `
+
+// 获取Table的Title
+const batchMenuOptions = noSelected => [
+  { key: 'batchPublish', name: '批量发布', props: { disabled: noSelected } },
+  { key: 'batchDraft', name: '批量草稿', props: { disabled: noSelected } },
+  { key: 'batchRecycle', name: '批量回收', props: { disabled: noSelected } }
+]
+const getTableTitle = (currentPageData, selectedList = [], onOperate = function () {}) => {
+  const noSelected = selectedList.length < 1
+  return (
+    <div className={styles['list-title']}>
+      <div className={styles['title-actions']}>
+        <DropOption
+          menuText="批量修改"
+          menuOptions={batchMenuOptions(noSelected)}
+          buttonStyle={{ border: 'solid 1px #eee' }}
+          dropdownProps={{
+            disabled: noSelected
+          }}
+          onMenuClick={({ key }) => onOperate(key)}
+        />
+        <Popconfirm
+          placement="right"
+          title="这会完全删除这些文章，是否继续？"
+          onConfirm={() => onOperate('batchDelete')}
+          okText="是"
+          cancelText="否"
+        >
+          <Button type="danger" disabled={noSelected}>批量删除</Button>
+        </Popconfirm>
+      </div>
+      <div className={styles['title-search']}>
+        <Search
+          placeholder="搜索标题或者摘要"
+          style={{ width: 200 }}
+          onSearch={value => console.log(value)}
+        />
+      </div>
+    </div>
+  )
+}
 
 export class ArticleList extends PureComponent {
 
@@ -249,7 +298,8 @@ export class ArticleList extends PureComponent {
         query: '',
         filterDropdownVisible: false
       }
-    }
+    },
+    selectedList: []                    // 批量选中的文章ID
   }
 
   // 编辑文章状态（单篇 || 批量）
@@ -281,7 +331,7 @@ export class ArticleList extends PureComponent {
   }
 
   // 过滤搜索的input change事件处理
-  handleSearchInputChange = (query = '', type) => {
+  handleFilterSearchInputChange = (query = '', type) => {
     this.setState({
       model: {
         ...this.state.model,
@@ -294,7 +344,7 @@ export class ArticleList extends PureComponent {
   }
 
   // table搜索过滤
-  handleInputSearch = type => {
+  handleFilterInputSearch = type => {
     const { filter, sorter } = this.props
     const params = {
       page: 1,
@@ -349,25 +399,61 @@ export class ArticleList extends PureComponent {
     }
   }
 
+  handleBatchOperate = type => {
+    const indexes = this.state.selectedList.map(id => {
+      return this.props.articleList.findIndex(item => item._id === id)
+    })
+    const ids = [...this.state.selectedList]
+    switch (type) {
+      case 'batchPublish':
+        this._editArticleState(ids, indexes, 1)
+        break
+      case 'batchDraft':
+        this._editArticleState(ids, indexes, 0)
+        break
+      case 'batchRecycle':
+        this._editArticleState(ids, indexes, -1)
+        break
+      case 'batchDelete':
+        this._deleteArticle(ids, indexes)
+        break
+      default:
+        break
+    }
+  }
+
+  // 行选择
+  handleTableSelectChange = (selectedRowKeys, selectedRows) => {
+    console.log(selectedRowKeys, selectedRows)
+    this.setState({ selectedList: selectedRowKeys })
+  }
+
   render () {
-    const { articleList, pagination, listFetching, listEditing, listDeleting, onSelect, onSelectAll } = this.props
+    const { articleList, pagination, listFetching, listEditing, listDeleting } = this.props
     const { total, current_page, per_page } = pagination
     
     const computedPagination = {
       current: current_page,
       total,
-      pageSize: per_page
+      pageSize: per_page,
+      showTotal: getPaginationTotal
+    }
+
+    const rowSelection = {
+      onChange: this.handleTableSelectChange
     }
 
     return (
       <div className={styles['article-list']}>
         <Table
+          selectedRowKeys={[1,2,3,4,5,6,7,8,9,10]}
+          title={(currentPageData) => getTableTitle(currentPageData, this.state.selectedList, this.handleBatchOperate)}
           loading={listFetching || listEditing || listDeleting}
           dataSource={getComputedList(articleList)}
           columns={getListColumn(this)}
           pagination={computedPagination}
           onChange={this.handleTableChange}
-          rowSelection={{ onSelect, onSelectAll }}
+          rowSelection={rowSelection}
           expandedRowRender={getExcerptRow}
         />
       </div>
@@ -386,9 +472,7 @@ ArticleList.propTypes = {
   sorter: PropTypes.object.isRequired,          // 文章排序
   fetchArticleList: PropTypes.func.isRequired,  // 文章获取方法
   editArticle: PropTypes.func.isRequired,       // 文章修改状态方法
-  deleteArticle: PropTypes.func.isRequired,     // 文章删除方法
-  onSelect: PropTypes.func.isRequired,
-  onSelectAll: PropTypes.func.isRequired
+  deleteArticle: PropTypes.func.isRequired      // 文章删除方法
 }
 
 export default ArticleList

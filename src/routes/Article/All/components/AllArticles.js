@@ -15,10 +15,6 @@ export class AllArticles extends Component {
     editArticle: PropTypes.func.isRequired        // 文章修改状态方法
   }
 
-  state = {
-    selectedList: []              // 批量选中的文章ID
-  }
-
   componentWillMount () {
     this._init()
   }
@@ -57,30 +53,13 @@ export class AllArticles extends Component {
     
   }
 
-  // 单选
-  handleTableSelect = (record, selected, selectedRows) => {
-    this.setState({ selectedList: selectedRows.map(item => item._id) })
-  }
-
-  // 全选
-  handleTableSelectAll = (selected, selectedRows, changeRows) => {
-    this.setState({
-      selectedList: selected ? this.props.articleList.map(item => item._id) : []
-    })
-  }
-
   render () {
-    const listProps = {
-      onSelect: this.handleTableSelect,
-      onSelectAll: this.handleTableSelectAll
-    }
-
     return (
       <Card
         className={styles['page-articles']}
         title={<h4>共<Tag color="blue" className={styles['article-count']}>{ this.props.pagination.total || 0 }</Tag>篇文章</h4>}
       >
-        <ArticleList {...listProps} />
+        <ArticleList />
       </Card>
     )
   }
