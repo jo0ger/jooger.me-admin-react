@@ -35,8 +35,19 @@ module.exports = [
         name: '文章详情',
         icon: 'file-text',
         hidden: true
+      },
+      {
+        key: 'edit',
+        name: '文章编辑',
+        icon: 'edit',
+        hidden: true
       }
     ],
+  },
+  {
+    key: 'comment',
+    name: '评论管理',
+    icon: 'message'
   },
   {
     key: 'other',

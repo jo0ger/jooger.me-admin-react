@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { Card, Row, Col, Form } from 'antd'
+import { Card, Row, Col, Form, Tag, Icon, Button } from 'antd'
 import styles from '../assets/articleDetail'
 import Service from '~service'
 import { fmtDate } from '~utils'
 
 const FormItem = Form.Item
 
-const formOptions = [
+const formBasicOptions = [
   { key: '_id', label: 'ID' },
   { key: 'title', label: '标题' },
   { key: 'create_at', label: '发布时间' },
@@ -23,6 +24,7 @@ const formOptions = [
 ]
 
 const infoTextStyleName = styles['info-item-text']
+const noDataItem = <span className={infoTextStyleName}>---</span>
 
 const getBasicInfoItem = (key = '', articleDetail) => {
   switch (key) {
@@ -30,23 +32,39 @@ const getBasicInfoItem = (key = '', articleDetail) => {
     case 'update_at':
       return <span className={infoTextStyleName}>{fmtDate(articleDetail[key])}</span>
     case 'category':
-      return <span className={infoTextStyleName}>{articleDetail[key].name}</span>
+      const _extends = articleDetail[key] ? articleDetail[key].extends : []
+      const _color = _extends.find(item => item.key === 'color') || {}
+      return articleDetail[key] && articleDetail[key].name
+        ? <Tag color={_color.value || 'blue'}>{ articleDetail[key].name }</Tag>
+        : noDataItem
     case 'tag':
-      return articleDetail.tag.map(item => (
-        <span className={infoTextStyleName}>{item.name}</span>
-      ))
+      return articleDetail.tag.length
+        ? articleDetail.tag.map(item => {
+          let _color = item.extends.find(item => item.key === 'color') || {}
+          let _icon = item.extends.find(item => item.key === 'icon') || {}
+          return <Tag color={_color.value || 'blue'}><Icon type={_icon.value} />{ item.name }</Tag>
+        })
+        : noDataItem
     case 'keywords':
-      return articleDetail.keywords.map(item => <span className={infoTextStyleName}>{item}</span>)
+      return articleDetail.keywords.length
+        ? articleDetail.keywords.map(item => <span className={infoTextStyleName}>{item}</span>)
+        : noDataItem
     case 'visit':
     case 'likes':
-    case 'comments':
       return <span className={infoTextStyleName}>{articleDetail.meta[key]}</span>
+    case 'comments':
+      return (
+        <div>
+          <span className={infoTextStyleName}>{articleDetail.meta[key]}</span>
+          <Button className={styles['view-comments-btn']}>查看评论</Button>
+        </div>
+      )
     case 'extends': 
-      return articleDetail.extends.map(item => (
+      return articleDetail.extends.length ? articleDetail.extends.map(item => (
         <span className={infoTextStyleName}>{item.key + ':' + item.value}</span>
-      ))
+      )) : noDataItem
     default:
-      return <span className={infoTextStyleName}>{articleDetail[key]}</span>
+      return <span className={infoTextStyleName}>{articleDetail[key] || '---'}</span>
   }
 }
 
@@ -61,7 +79,6 @@ export class ArticleDetail extends PureComponent {
   }
 
   componentWillMount () {
-    console.log(this.props)
     this._fetchArticleDetail()
   }
 
@@ -84,7 +101,7 @@ export class ArticleDetail extends PureComponent {
             <Card title={<h4>文章基本信息</h4>}>
               {
                 articleDetail._id ? (
-                  formOptions.map(item => (
+                  formBasicOptions.map(item => (
                     <FormItem
                       key={item.key}
                       label={item.label}
@@ -99,13 +116,14 @@ export class ArticleDetail extends PureComponent {
             </Card>
           </Col>
           <Col span={18}>
-            <Card title={<h4></h4>}>
-              <Form>
-                <FormItem label="">
-
-                </FormItem>
-
-              </Form>
+            <Card title={
+              <h4 className={styles['content-title']}>文章内容
+                <Link to={`/article/edit/${articleDetail._id}`}>
+                  <Button type="primary" className={styles['go-edit-btn']}>去编辑</Button>
+                </Link>
+              </h4>}
+            >
+              <div data-view="markdown-body" dangerouslySetInnerHTML={{__html: articleDetail.rendered_content}} />
             </Card>
           </Col>
         </Row>

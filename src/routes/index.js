@@ -1,10 +1,11 @@
 import React from 'react'
 import Bundle from '~components/Bundle'
 import AppLayout from '~layouts/AppLayout'
-import { AllArticles, ArticleDetail } from './Article'
-import Home from './Home'
-import CounterRoute from './Counter'
-import ZenRoute from './Zen'
+import {
+  AllArticlesRoute,
+  ArticleDetailRoute,
+  ArticleEditRoute
+} from './Article'
 import PageNotFound from './PageNotFound'
 
 const bundleAsyncRoute = (load, Loading = null) => {
@@ -30,31 +31,19 @@ export const createRoutes = store => {
       {
         path: '/article/all',
         name: 'allArticles',
-        component: bundleAsyncRoute(AllArticles(store)),
+        component: bundleAsyncRoute(AllArticlesRoute(store)),
         exact: true
       },
       {
         path: '/article/detail/:id',
         name: 'articleDetail',
-        component: bundleAsyncRoute(ArticleDetail(store)),
+        component: bundleAsyncRoute(ArticleDetailRoute(store)),
         exact: true
       },
       {
-        path: '/home',
-        name: 'home',
-        component: Home,
-        exact: true
-      },
-      {
-        path: '/counter',
-        name: 'counter',
-        component: bundleAsyncRoute(CounterRoute(store)),
-        exact: true
-      },
-      {
-        path: '/zen',
-        name: 'zen',
-        component: bundleAsyncRoute(ZenRoute(store)),
+        path: '/article/edit/:id',
+        name: 'articleEdit',
+        component: bundleAsyncRoute(ArticleEditRoute(store)),
         exact: true
       },
       {

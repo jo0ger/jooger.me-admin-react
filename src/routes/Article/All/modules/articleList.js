@@ -237,7 +237,7 @@ const initialState = {
   filter: {},         // 列表过滤信息
   sorter: {}
 }
-export default function articleReducer (state = initialState, action) {
+export default function articleListReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action.payload) : state
 }

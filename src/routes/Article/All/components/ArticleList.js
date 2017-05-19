@@ -102,7 +102,7 @@ const getListColumn = ctx => {
         <div className="custom-filter-dropdown">
           <Input
             ref={ele => ctx.categorySearchInput = ele}
-            placeholder="Search name"
+            placeholder="搜索分类"
             value={category.query}
             onChange={e => handleFilterSearchInputChange(e.target.value, 'category')}
             onPressEnter={onCategorySearch}
@@ -115,11 +115,17 @@ const getListColumn = ctx => {
       filterDropdownVisible: category.filterDropdownVisible,
       onFilterDropdownVisibleChange: visible => handleFilterDropdownVisibleChange(visible, 'category'),
       filterIcon: <Icon type="search" style={{ color: !!category.query ? '#108ee9' : '#aaa' }} />,
-      render: ({ name, color }) => (
-        <Link to={`/article/category/${name}`}>
-          <Tag color={color || 'blue'}>{ name }</Tag>
-        </Link>
-      )
+      render: (text) => {
+        if (!text) {
+          return null
+        }
+        const { name, color } = text
+        return (
+          <Link to={`/article/category/${name}`}>
+            <Tag color={color || 'blue'}>{ name }</Tag>
+          </Link>
+        )
+      }
     },
     {
       title: '标签',
@@ -129,7 +135,7 @@ const getListColumn = ctx => {
         <div className="custom-filter-dropdown">
           <Input
             ref={ele => ctx.tagSearchInput = ele}
-            placeholder="Search name"
+            placeholder="搜索标签"
             value={tag.query}
             onChange={e => handleFilterSearchInputChange(e.target.value, 'tag')}
             onPressEnter={onTagSearch}
@@ -144,7 +150,7 @@ const getListColumn = ctx => {
       filterIcon: <Icon type="search" style={{ color: !!tag.query ? '#108ee9' : '#aaa' }} />,
       render: list => {
         return (
-          list.map(({ name, ...rest }, index) => {
+          list.length ? list.map(({ name, ...rest }, index) => {
             let extend = rest.extends
             let colorItem = extend.find(item => item.key === 'color')
             return (
@@ -152,7 +158,7 @@ const getListColumn = ctx => {
                 <Tag color={colorItem ? colorItem.value : 'blue'}>{ name }</Tag>
               </Link>
             )
-          })
+          }) : null
         )
       }
     },

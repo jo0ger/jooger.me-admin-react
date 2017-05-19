@@ -14,6 +14,15 @@ const code = {
   UNAUTHORIZED: 401
 }
 
+instance.interceptors.request.use(config => {
+  console.log(config)
+  config.params = config.params || {}
+  if (!isProd) {
+    config.params._DEV_ = true
+  }
+  return config
+})
+
 instance.interceptors.response.use(response => {
   if (!response || !response.data) {
     // TODO 提示服务器异常
