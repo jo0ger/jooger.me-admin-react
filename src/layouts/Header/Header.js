@@ -55,7 +55,6 @@ export class Header extends Component {
   render () {
     const menuItems = getMenus(menu)
     const { pathname = '/' } = this.props.location
-    console.log(pathname)
     return (
       <header className={styles['g-header']}>
         <div className={styles.logo} />

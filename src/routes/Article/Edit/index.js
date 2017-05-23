@@ -3,6 +3,11 @@ import loadArticleEdit from 'bundle-loader?lazy!./containers/ArticleEditContaine
 import articleEditReducer from './modules/articleEdit'
 
 export default store => {
-  injectReducer(store, { name: 'articleDetail', reducer: articleEditReducer })
-  return loadArticleEdit
+  return {
+    load: loadArticleEdit,
+    preload: load => injectReducer(store, {
+      name: 'articleDetail',
+      reducer: articleEditReducer
+    })
+  }
 }

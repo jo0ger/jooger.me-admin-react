@@ -3,7 +3,7 @@ import { fetchList, editArticle } from '../modules/articleList'
 import AllArticles from '../components/AllArticles'
 
 const mapState2Props = state => {
-  const { data, filter, sorter, pagination } = state.articleList
+  const { data = [], filter = {}, sorter = {}, pagination = {} } = state.articleList || {}
   return {
     articleList: data,
     filter,

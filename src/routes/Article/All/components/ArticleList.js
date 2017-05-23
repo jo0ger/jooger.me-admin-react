@@ -153,9 +153,10 @@ const getListColumn = ctx => {
           list.length ? list.map(({ name, ...rest }, index) => {
             let extend = rest.extends
             let colorItem = extend.find(item => item.key === 'color')
+            let iconItem = extend.find(item => item.key === 'icon') || {}
             return (
               <Link to={`/article/tag/${name}`} key={rest._id}>
-                <Tag color={colorItem ? colorItem.value : 'blue'}>{ name }</Tag>
+                <Tag color={colorItem ? colorItem.value : 'blue'}><Icon type={iconItem.value} />{ name }</Tag>
               </Link>
             )
           }) : null

@@ -8,10 +8,10 @@ import {
 } from './Article'
 import PageNotFound from './PageNotFound'
 
-const bundleAsyncRoute = (load, Loading = null) => {
-  return (props) => (
-    <Bundle load={load}>
-      {(Mod) => Mod ? <Mod {...props} /> : Loading}
+const bundleAsyncRoute = ({ load, callback, ...rest }, Loading = null) => {
+  return props => (
+    <Bundle load={load} callback={callback} {...rest}>
+      {Mod => Mod ? <Mod {...props} /> : Loading}
     </Bundle>
   )
 }

@@ -4,7 +4,6 @@ import { fetchList, editArticle, deleteArticle } from '../modules/articleList'
 import ArticleList from '../components/ArticleList'
 
 const mapState2Props = state => {
-  console.log(state)
   const { fetching, editing, deleting, data, pagination, filter, sorter } = state.articleList
   return {
     listFetching: fetching,

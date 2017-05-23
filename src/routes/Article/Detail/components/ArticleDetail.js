@@ -11,6 +11,7 @@ const FormItem = Form.Item
 const formBasicOptions = [
   { key: '_id', label: 'ID' },
   { key: 'title', label: '标题' },
+  { key: 'excerpt', label: '摘要' },
   { key: 'create_at', label: '发布时间' },
   { key: 'update_at', label: '修改时间' },
   { key: 'category', label: '分类' },
@@ -19,8 +20,7 @@ const formBasicOptions = [
   { key: 'visit', label: '浏览数' },
   { key: 'likes', label: '喜欢数' },
   { key: 'comments', label: '评论数' },
-  { key: 'extends', label: '其他属性' },
-  { key: 'excerpt', label: '摘要' }
+  { key: 'extends', label: '扩展项' }
 ]
 
 const infoTextStyleName = styles['info-item-text']
@@ -68,6 +68,11 @@ const getBasicInfoItem = (key = '', articleDetail) => {
   }
 }
 
+const formItemLayout = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 18 },
+}
+
 export class ArticleDetail extends PureComponent {
 
   static propTypes = {
@@ -98,26 +103,29 @@ export class ArticleDetail extends PureComponent {
       <div className={styles['page-article-detail']}>
         <Row gutter={16}>
           <Col span={6}>
-            <Card title={<h4>文章基本信息</h4>}>
+            <Card title={<h4>Basic Info</h4>}>
               {
                 articleDetail._id ? (
-                  formBasicOptions.map(item => (
-                    <FormItem
-                      key={item.key}
-                      label={item.label}
-                      labelCol={{ span: 6 }}
-                      wrapperCol={{ span: 18 }}
-                    >
-                      {getBasicInfoItem(item.key, articleDetail)}
-                    </FormItem>
-                  ))
+                  <Form>
+                    {
+                      formBasicOptions.map(item => (
+                        <FormItem
+                          key={item.key}
+                          label={item.label}
+                          {...formItemLayout}
+                        >
+                          {getBasicInfoItem(item.key, articleDetail)}
+                        </FormItem>
+                      ))
+                    }
+                  </Form>
                 ) : null
               }
             </Card>
           </Col>
           <Col span={18}>
             <Card title={
-              <h4 className={styles['content-title']}>文章内容
+              <h4 className={styles['content-title']}>Rendered Content
                 <Link to={`/article/edit/${articleDetail._id}`}>
                   <Button type="primary" className={styles['go-edit-btn']}>去编辑</Button>
                 </Link>

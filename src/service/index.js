@@ -15,7 +15,6 @@ const code = {
 }
 
 instance.interceptors.request.use(config => {
-  console.log(config)
   config.params = config.params || {}
   if (!isProd) {
     config.params._DEV_ = true
