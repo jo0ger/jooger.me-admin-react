@@ -61,11 +61,13 @@ const ACTION_HANDLERS = {
     ...state,
     fetching: false
   }),
-  [FETCH_TAG_LIST_SUCCESS]: (state, { list }) => ({
-    ...state,
-    fetching: false,
-    data: list
-  })
+  [FETCH_TAG_LIST_SUCCESS]: (state, { list }) => {
+    return {
+      ...state,
+      fetching: false,
+      data: list
+    }
+  }
 }
 
 // ------------------------------------
@@ -78,5 +80,5 @@ const initialState = {
 }
 export default function tagReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
-  return handler ? handler(state, action.payload) : initialState
+  return handler ? handler(state, action.payload) : state
 }

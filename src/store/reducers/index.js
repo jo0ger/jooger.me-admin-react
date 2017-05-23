@@ -3,11 +3,13 @@ import categoryReducer from './category'
 import tagReducer from './tag'
 
 export const makeRootReducer = (asyncReducers) => {
-  return combineReducers({
+  const c = {
     category: categoryReducer,
     tag: tagReducer,
     ...asyncReducers
-  })
+  }
+  console.log(c)
+  return combineReducers(c)
 }
 
 export const injectReducer = (store, { name, reducer }) => {

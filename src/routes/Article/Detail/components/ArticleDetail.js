@@ -1,10 +1,11 @@
 import React, { PureComponent } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { Card, Row, Col, Form, Tag, Icon, Button } from 'antd'
+import { Card, Affix, Row, Col, Form, Tag, Icon, Button } from 'antd'
 import styles from '../assets/articleDetail'
 import Service from '~service'
 import { fmtDate } from '~utils'
+import globalStyles from '~styles/index'
 
 const FormItem = Form.Item
 
@@ -42,7 +43,7 @@ const getBasicInfoItem = (key = '', articleDetail) => {
         ? articleDetail.tag.map(item => {
           let _color = item.extends.find(item => item.key === 'color') || {}
           let _icon = item.extends.find(item => item.key === 'icon') || {}
-          return <Tag color={_color.value || 'blue'}><Icon type={_icon.value} />{ item.name }</Tag>
+          return <Tag color={_color.value || 'blue'} key={item._id}><Icon type={_icon.value} />{ item.name }</Tag>
         })
         : noDataItem
     case 'keywords':
@@ -56,7 +57,9 @@ const getBasicInfoItem = (key = '', articleDetail) => {
       return (
         <div>
           <span className={infoTextStyleName}>{articleDetail.meta[key]}</span>
-          <Button className={styles['view-comments-btn']}>查看评论</Button>
+          <Link to={`/comment?article_id=${articleDetail._id}`}>
+            <Button className={styles['view-comments-btn']}>查看评论</Button>
+          </Link>
         </div>
       )
     case 'extends': 
@@ -69,8 +72,8 @@ const getBasicInfoItem = (key = '', articleDetail) => {
 }
 
 const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 18 },
+  labelCol: { span: 4 },
+  wrapperCol: { span: 20 },
 }
 
 export class ArticleDetail extends PureComponent {
@@ -103,29 +106,31 @@ export class ArticleDetail extends PureComponent {
       <div className={styles['page-article-detail']}>
         <Row gutter={16}>
           <Col span={6}>
-            <Card title={<h4>Basic Info</h4>}>
-              {
-                articleDetail._id ? (
-                  <Form>
-                    {
-                      formBasicOptions.map(item => (
-                        <FormItem
-                          key={item.key}
-                          label={item.label}
-                          {...formItemLayout}
-                        >
-                          {getBasicInfoItem(item.key, articleDetail)}
-                        </FormItem>
-                      ))
-                    }
-                  </Form>
-                ) : null
-              }
-            </Card>
+            <Affix offsetTop={64}>
+              <Card title={<h4>基本信息</h4>} className={globalStyles['basic-info']}>
+                {
+                  articleDetail._id ? (
+                    <Form>
+                      {
+                        formBasicOptions.map(item => (
+                          <FormItem
+                            key={item.key}
+                            label={item.label}
+                            {...formItemLayout}
+                          >
+                            {getBasicInfoItem(item.key, articleDetail)}
+                          </FormItem>
+                        ))
+                      }
+                    </Form>
+                  ) : null
+                }
+              </Card>
+            </Affix>
           </Col>
           <Col span={18}>
             <Card title={
-              <h4 className={styles['content-title']}>Rendered Content
+              <h4 className={styles['content-title']}>Markdown内容
                 <Link to={`/article/edit/${articleDetail._id}`}>
                   <Button type="primary" className={styles['go-edit-btn']}>去编辑</Button>
                 </Link>

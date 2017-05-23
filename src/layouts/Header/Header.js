@@ -62,7 +62,7 @@ export class Header extends Component {
           className={styles.menus}
           theme="light"
           mode="horizontal"
-          defaultSelectedKeys={[pathname !== '/' ? pathname : '/dashboard']}
+          selectedKeys={[pathname !== '/' ? pathname : '/dashboard']}
         >
           { menuItems }
         </Menu>

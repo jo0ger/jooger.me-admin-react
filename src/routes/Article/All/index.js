@@ -4,7 +4,7 @@ import articleListReducer from './modules/articleList'
 export default (store) => {
   return {
     load: require('bundle-loader?lazy!./containers/AllArticlesContainer'),
-    preload: load => {
+    preload: () => {
       injectReducer(store, { name: 'articleList', reducer: articleListReducer })
     }
   }

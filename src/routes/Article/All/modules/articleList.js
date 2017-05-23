@@ -29,10 +29,10 @@ export const requestListFailure = err => ({
 // 请求
 // refresh 是否刷新列表 default: false
 export const fetchList = (params = {}, filter = {}, sorter = {}, refresh = true) => (dispatch, getState) => {
-  // if (getState().articleList.fetching) {
-  //   // TODO 提示 请勿频繁操作？？？
-  //   return
-  // }
+  if (getState().articleList.fetching) {
+    // TODO 提示 请勿频繁操作？？？
+    return
+  }
   // 请求开始
   dispatch(requestList())
   return Service.article.getList({ params }).then(({ code, data }) => {

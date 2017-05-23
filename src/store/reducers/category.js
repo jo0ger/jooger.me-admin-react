@@ -53,13 +53,10 @@ export const fetchCategoryList = () => (dispatch, getState) => {
 // ACTION_HANDLERS
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [FETCH_CATEGORY_LIST_REQUEST]: state => {
-    console.log(state)
-    return {
-      ...state,
-      fetching: true
-    }
-  },
+  [FETCH_CATEGORY_LIST_REQUEST]: state => ({
+    ...state,
+    fetching: true
+  }),
   [FETCH_CATEGORY_LIST_FAILURE]: state => ({
     ...state,
     fetching: false
@@ -81,5 +78,5 @@ const initialState = {
 }
 export default function categoryReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
-  return handler ? handler(state, action.payload) : initialState
+  return handler ? handler(state, action.payload) : state
 }
