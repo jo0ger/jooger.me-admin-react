@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Affix, Row, Col, Form, Button, Input, Select, Spin, Radio } from 'antd'
+import { Card, Affix, Row, Col, Form, Button, Input, Select, Spin, Radio, Icon } from 'antd'
 import styles from '../assets/articleEdit'
 import { classnames } from '~utils'
 import globalStyles from '~styles/index'
@@ -10,6 +10,7 @@ const SelectOption = Select.Option
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 const ButtonGroup = Button.Group
+const InputGroup = Input.Group
 
 const formBasicOptions = [
   { key: 'state', label: '状态' },
@@ -27,8 +28,17 @@ const formItemLayout = {
   wrapperCol: { span: 20 },
 }
 
+const formItemLayoutWithOutLabel = {
+  wrapperCol: {
+    xs: { span: 24, offset: 0 },
+    sm: { span: 20, offset: 0 },
+  },
+}
+
+let uuid = 0
 export class ArticleEdit extends Component {
   static defaultProps = {
+    form: PropTypes.object.isRequired,
     match: PropTypes.object.isRequired,
     articleDetail: PropTypes.object.isRequired,
     defailtFetching: PropTypes.bool.isRequired,
@@ -50,7 +60,7 @@ export class ArticleEdit extends Component {
     tagFetched: false
   }
   
-  componentWillMount() {
+  componentWillMount () {
     const articleId = this.props.match.params.id
     this.props.fetchArticleDetail(articleId).then(code => {
       if (!code) {
@@ -133,7 +143,50 @@ export class ArticleEdit extends Component {
       case 'keywords':
         return <Select mode="tags" placeholder="Input some keywords" onChange={this.handleKeywordsChange} tokenSeparators={[',']} />
       case 'thumbs':
+        return
       case 'extends':
+        const { getFieldDecorator, getFieldValue } = this.props.form
+        getFieldDecorator('keys', { initialValue: [] })
+        const keys = getFieldValue('keys')
+        const formItems = keys.map((k, index) => {
+          return (
+            <div className={styles['extends-item']}>
+              {getFieldDecorator(`names-${k}`, {
+                validateTrigger: ['onChange', 'onBlur'],
+                rules: [{
+                  required: true,
+                  whitespace: true,
+                  message: "Please input passenger's name or delete this field.",
+                }],
+              })(
+                <InputGroup>
+                  <Col span="10">
+                    <Input placeholder="key" />
+                  </Col>
+                  <Col span="11">
+                    <Input placeholder="value" />
+                  </Col>
+                  <Col span="3">
+                    <Icon
+                      className={styles['extends-delete-btn']}
+                      type="minus-circle-o"
+                      disabled={keys.length === 1}
+                      onClick={() => this.removeExtendItem(k)}
+                    />
+                  </Col>
+                </InputGroup>
+              )}
+            </div>
+          )
+        })
+        return (
+          <FormItem>
+            {formItems}
+            <Button type="dashed" onClick={this.addExtendItem} style={{ width: '100%' }}>
+              <Icon type="plus" /> Add field
+            </Button>
+          </FormItem>
+        )
       default:
         break
     }
@@ -158,6 +211,25 @@ export class ArticleEdit extends Component {
       !code && (this.setState({
         tagFetched: true
       }))
+    })
+  }
+  
+  addExtendItem = () => {
+    uuid++
+    const { form } = this.props
+    const keys = form.getFieldValue('keys')
+    const nextKeys = keys.concat(uuid)
+    // important! notify form to detect changes
+    form.setFieldsValue({
+      keys: nextKeys,
+    })
+  }
+
+  removeExtendItem = k => {
+    const { form } = this.props
+    const keys = form.getFieldValue('keys')
+    form.setFieldsValue({
+      keys: keys.filter(key => key !== k),
     })
   }
 
@@ -205,35 +277,34 @@ export class ArticleEdit extends Component {
         <Row gutter={16}>
           <Col span={6}>
             <Affix offsetTop={64}>
-              <Card
-                className={globalStyles['basic-info']}
-                title={
-                <h4 className={styles['info-title']}>基本信息
-                  <ButtonGroup className={styles['action-btns']}>
-                    <Button type="primary" onClick={this.handleSubmit}>提交</Button>
-                    <Button onClick={this.handleReset}>重置</Button>
-                  </ButtonGroup>
-                </h4>
-              }
-              >
-                {
-                  articleModel._id ? (
-                    <Form>
-                      {
-                        formBasicOptions.map(item => (
-                          <FormItem
-                            key={item.key}
-                            label={item.label}
-                            {...formItemLayout}
-                          >
-                            {this.getBasicInfoItem(item.key, articleModel)}
-                          </FormItem>
-                        ))
-                      }
-                    </Form>
-                  ) : null
-                }
-              </Card>
+              <div>
+                <Card
+                  className={globalStyles['basic-info']}
+                  title={<h4 className={styles['info-title']}>基本信息</h4>}
+                >
+                  {
+                    articleModel._id ? (
+                      <Form>
+                        {
+                          formBasicOptions.map(item => (
+                            <FormItem
+                              key={item.key}
+                              label={item.label}
+                              {...formItemLayout}
+                            >
+                              {this.getBasicInfoItem(item.key, articleModel)}
+                            </FormItem>
+                          ))
+                        }
+                      </Form>
+                    ) : null
+                  }
+                </Card>
+                <ButtonGroup className={styles['action-btns']}>
+                  <Button type="primary" onClick={this.handleSubmit}>提交</Button>
+                  <Button onClick={this.handleReset}>重置</Button>
+                </ButtonGroup>
+              </div>
             </Affix>
           </Col>
           <Col span={18}>
@@ -248,4 +319,4 @@ export class ArticleEdit extends Component {
 
 }
 
-export default ArticleEdit
+export default Form.create()(ArticleEdit)

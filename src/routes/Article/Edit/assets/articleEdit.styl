@@ -6,12 +6,13 @@
   .info-title {
     position: relative;
 
-    .action-btns {
-      position: absolute;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-    }
+
+  }
+
+  .action-btns {
+    left: 50%;
+    margin-top: 16px;
+    transform: translateX(-50%);
   }
 
   .state-checked {
@@ -33,6 +34,23 @@
       border-color: $red-6;
       box-shadow: -1px 0 0 0 $red-6;
       background-color: $red-6;
+    }
+  }
+
+  .extends-item {
+    margin-bottom: 8px;
+
+    .extends-delete-btn {
+      cursor: pointer;
+      position: relative;
+      top: 4px;
+      font-size: 20px;
+      color: $grey-6;
+      transition: all .3s;
+
+      &:hover {
+        color: $red-6;
+      }
     }
   }
 
