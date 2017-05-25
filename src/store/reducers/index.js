@@ -1,15 +1,9 @@
 import { combineReducers } from 'redux'
-import categoryReducer from './category'
-import tagReducer from './tag'
 
-export const makeRootReducer = (asyncReducers) => {
-  const c = {
-    category: categoryReducer,
-    tag: tagReducer,
+export const makeRootReducer = (asyncReducers = {}) => {
+  return combineReducers({
     ...asyncReducers
-  }
-  console.log(c)
-  return combineReducers(c)
+  })
 }
 
 export const injectReducer = (store, { name, reducer }) => {

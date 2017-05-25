@@ -1,40 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Header from '~layouts/Header'
-import Bread from '~layouts/Bread'
-import Main from '~layouts/Main'
-import Footer from '~layouts/Footer'
-import styles from './AppLayout.styl'
+import './AppLayout.styl'
 
-export const AppLayout = ({ children, location }) => {
-
-  const headerProps = {
-    location
-  }
-
-  const breadProps = {
-    location
-  }
-
-  const mainProps = {
-    location
-  }
-  
+export const AppLayout = ({ children }) => {
   return (
-    <div className={styles['app-layout']}>
-      <Header {...headerProps} />
-      <Bread {...breadProps} />
-      <Main {...mainProps}>
+    <div className="container text-center">
+      <Header />
+      <div className="core-layout__viewport">
         {children}
-      </Main>
-      <Footer />
+      </div>
     </div>
   )
 }
 
 AppLayout.propTypes = {
-  children: PropTypes.element.isRequired,
-  location: PropTypes.object.isRequired
+  children: PropTypes.element.isRequired
 }
 
 export default AppLayout

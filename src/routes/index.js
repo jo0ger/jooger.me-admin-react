@@ -1,11 +1,7 @@
 import React from 'react'
 import Bundle from '~components/Bundle'
 import AppLayout from '~layouts/AppLayout'
-import {
-  AllArticlesRoute,
-  ArticleDetailRoute,
-  ArticleEditRoute
-} from './Article'
+import Home from './Home'
 import PageNotFound from './PageNotFound'
 
 const bundleAsyncRoute = ({ load, callback, ...rest }, Loading = null) => {
@@ -24,26 +20,14 @@ export const createRoutes = store => {
       {
         redirect: {
           from: '/',
-          to: '/dashboard',
+          to: '/home',
           push: false
         }
       },
       {
-        path: '/article/all',
-        name: 'allArticles',
-        component: bundleAsyncRoute(AllArticlesRoute(store)),
-        exact: true
-      },
-      {
-        path: '/article/detail/:id',
-        name: 'articleDetail',
-        component: bundleAsyncRoute(ArticleDetailRoute(store)),
-        exact: true
-      },
-      {
-        path: '/article/edit/:id',
-        name: 'articleEdit',
-        component: bundleAsyncRoute(ArticleEditRoute(store)),
+        path: '/home',
+        name: 'home',
+        component: Home,
         exact: true
       },
       {

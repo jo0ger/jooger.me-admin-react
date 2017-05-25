@@ -40,4 +40,3 @@ if (__DEV__) {
 
 // START RENDER APP
 renderApp()
-

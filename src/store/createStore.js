@@ -9,11 +9,11 @@ export const createStoreWithMiddleware = (initialState = {}) => {
   ]
   const enhanders = []
   if (__DEV__) {
-    const devToolsExtension = window.devToolsExtension
+    // const devToolsExtension = window.devToolsExtension
     const DevTools = require('~components/DevTools').default
-    if (typeof devToolsExtension === 'function') {
-      enhanders.push(devToolsExtension)
-    }
+    // if (typeof devToolsExtension === 'function') {
+    //   enhanders.push(devToolsExtension)
+    // }
     enhanders.push(DevTools.instrument())
     middleWare.push(createLogger())
   }

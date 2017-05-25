@@ -17,31 +17,28 @@ class AppContainer extends Component {
   
   render () {
     const { store, routes } = this.props
-    const AppLayout = routes.component
+    const Layout = routes.component
     const childRoutes = routes.childRoutes
 
     return (
       <Provider store={store}>
         <div className="app">
           <Router basename={routes.basename || '/'}>
-            <Route render={routeProps => (
-              <AppLayout {...routeProps}>
-                <Switch>
-                  {
-                    childRoutes.map((route, index) => {
-                      return (
-                        route.redirect ? (
-                          <Redirect {...route.redirect} key={index} exact />
-                        ) : (
-                          <Route {...route} key={index} />
-                        )
+            <Layout>
+              <Switch>
+                {
+                  childRoutes.map((route, index) => {
+                    return (
+                      route.redirect ? (
+                        <Redirect {...route.redirect} key={index} exact />
+                      ) : (
+                        <Route {...route} key={index} />
                       )
-                    })
-                  }
-                </Switch>
-              </AppLayout>
-            )}
-            />
+                    )
+                  })
+                }
+              </Switch>
+            </Layout>
           </Router>
           { this.props.children }
         </div>
