@@ -3,7 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "antd": "^2.10.2",
     "axios": "^0.16.1",
+    "babel-plugin-import": "^1.2.0",
+    "classnames": "^2.2.5",
+    "highlight.js": "^9.11.0",
+    "marked": "^0.3.6",
     "normalize.css": "^7.0.0",
     "prop-types": "^15.5.8",
     "react": "^15.5.4",

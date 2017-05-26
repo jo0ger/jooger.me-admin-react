@@ -94,7 +94,11 @@ module.exports = merge(baseWebpackConfig, {
         test: /\.(js|jsx)$/,
         include: paths.appSrc,
         loader: 'babel',
-        
+        query: {
+          plugins: [
+            [ 'import', [{ libraryName: 'antd', style: 'css' }]]
+          ]
+        }
       },
       // The notation here is somewhat confusing.
       // "postcss" loader applies autoprefixer to our CSS.
@@ -121,7 +125,7 @@ module.exports = merge(baseWebpackConfig, {
         test: /\.styl$/,
         loader: ExtractTextPlugin.extract(
           'style',
-          'css?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!postcss!stylus',
+          'css?modules&importLoaders=1&localIdentName=[local]___[hash:base64:5]!postcss!stylus',
           extractTextPluginOptions
         )
       }

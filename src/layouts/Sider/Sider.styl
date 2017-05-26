@@ -1,0 +1,72 @@
+@import '../../styles/vars/index'
+@import '../../styles/mixins/index'
+
+.g_sider {
+  position: relative;
+  width: 240px;
+  height: 100%;
+  background-color: $grey-3;
+  border-right: 1px solid $border-color-base;
+
+  .hd {
+    flex()
+    position: relative;
+    height: 60px;
+    line-height: 60px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba($black, .06);
+
+    .create_btn {
+      position: relative;
+      flex-basis: 100px;
+      text-align: center;
+      cursor: pointer;
+
+      i {
+        color: $blue-6;
+        font-size: 20px;
+      }
+
+      span {
+        margin-left: 10px;
+        font-size: 14px;
+      }
+
+      &:hover {
+        span {
+          color: $blue-6;
+        }
+      }
+    }
+
+  }
+
+  .content {
+    position: absolute;
+    top: 61px;
+    width: 100%;
+
+    .menus {
+
+      .menu_item {
+        display: block;
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        padding: $btn-padding-sm;
+        color: $text-color;
+        text-align: center;
+        font-size: $font-size-lg;
+        letter-spacing: 1px;
+        transition: $transition-ease-out;
+
+        span {
+          margin-left: 10px;
+        }
+      }
+
+    }
+
+  }
+
+}

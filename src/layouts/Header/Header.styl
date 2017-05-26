@@ -1,4 +1,50 @@
-.route--active {
-  font-weight: bold;
-  text-decoration: underline;
+@import '../../styles/vars/index'
+@import '../../styles/mixins/index'
+
+.g_header {
+  .wrap {
+    position: relative;
+    width: 100%;
+    min-width: 1000px;
+    height: 50px;
+    z-index: $zindex-base;
+    background-color: $blue-6;
+
+    .logo {
+      flex()
+      float: left;
+      width: 240px;
+      height: 100%;
+
+      .logo_wrap {
+        width: 180px;
+        height: 40px;
+        background: alpha($white, .15);
+        border-radius: 6px;
+      }
+
+    }
+
+    .nav {
+      margin-left: 240px;
+      .nav_item {
+        display: inline-block;
+        width: 76px;
+        height: 50px;
+        line-height: 50px;
+        padding: $btn-padding-sm;
+        color: $text-color-secondary-dark;
+        text-align: center;
+        font-size: $font-size-lg;
+        letter-spacing: 1px;
+        transition: $transition-ease-out;
+      }
+    }
+
+    .actions {
+
+    }
+    
+  }
 }
+

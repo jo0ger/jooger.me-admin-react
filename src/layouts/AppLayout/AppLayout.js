@@ -1,14 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Header from '~layouts/Header'
-import './AppLayout.styl'
+import Sider from '~layouts/Sider'
+import ViewPort from '~layouts/ViewPort'
+import styles from './AppLayout.styl'
 
 export const AppLayout = ({ children }) => {
   return (
-    <div className="container text-center">
+    <div className={styles.app_layout}>
       <Header />
-      <div className="core-layout__viewport">
-        {children}
+      <div className={styles.main_container}>
+        <Sider />
+        <ViewPort>
+          {children}
+        </ViewPort>
       </div>
     </div>
   )

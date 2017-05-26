@@ -96,7 +96,10 @@ module.exports = merge(baseWebpackConfig, {
           // This is a feature of `babel-loader` for webpack (not Babel itself).
           // It enables caching results in ./node_modules/.cache/babel-loader/
           // directory for faster rebuilds.
-          cacheDirectory: true
+          cacheDirectory: true,
+          plugins: [
+            [ 'import', [{ libraryName: 'antd', style: 'css' }]]
+          ]
         }
       },
       // "postcss" loader applies autoprefixer to our CSS.
@@ -111,7 +114,7 @@ module.exports = merge(baseWebpackConfig, {
       {
         test: /\.styl$/,
         exclude: /node_modules/,
-        loader: 'style!css?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]!postcss!stylus?sourceMap'
+        loader: 'style!css?modules&importLoaders=1&localIdentName=[local]___[hash:base64:5]!postcss!stylus?sourceMap'
       }
       // ** STOP ** Are you adding a new loader?
       // Remember to add the new extension(s) to the "url" loader exclusion list.

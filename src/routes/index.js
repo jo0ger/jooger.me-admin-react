@@ -2,6 +2,7 @@ import React from 'react'
 import Bundle from '~components/Bundle'
 import AppLayout from '~layouts/AppLayout'
 import Home from './Home'
+import { AllArticleLoader } from './Article'
 import PageNotFound from './PageNotFound'
 
 const bundleAsyncRoute = ({ load, callback, ...rest }, Loading = null) => {
@@ -26,8 +27,14 @@ export const createRoutes = store => {
       },
       {
         path: '/home',
-        name: 'home',
+        name: 'Home',
         component: Home,
+        exact: true
+      },
+      {
+        path: '/article/all',
+        name: 'AllArticle',
+        component: bundleAsyncRoute(AllArticleLoader(store)),
         exact: true
       },
       {

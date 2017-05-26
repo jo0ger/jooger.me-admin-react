@@ -1,0 +1,27 @@
+@import '../../styles/vars/index'
+@import '../../styles/mixins/index'
+
+.page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background-color: $white;
+
+  &_left {
+    position: relative;
+    width: 320px;
+    height: 100%;
+    border-right: 1px solid $border-color-base;
+  }
+
+  &_right {
+    position: absolute;
+    left: 320px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+}
