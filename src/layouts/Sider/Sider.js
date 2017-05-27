@@ -2,6 +2,7 @@ import React from 'react'
 import { withRouter, NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Icon } from 'antd'
+import Transition from '~components/Transition'
 import styles from './Sider.styl'
 import { menu } from '~config'
 
@@ -9,6 +10,8 @@ const getChildRoutes = key => {
   const matched = menu.find(item => key.includes(item.key))
   return matched ? matched.children : null
 }
+
+const getParentPathname = pathname => pathname.split('/')[1]
 
 const createBtn = {
   '/article/all': { text: '新建文章' },
@@ -38,26 +41,28 @@ export const Sider = ({ location }) => {
 
   return (
     childRoutes ? (
-      <div className={styles.g_sider}>
-        {getSiderHd(pathname)}
-        <div className={styles.content}>
-          <div className={styles.menus}>
-            {
-              childRoutes.map(item => (
-                <NavLink
-                  key={item.key}
-                  to={`/${currentMenu.key}/${item.key}`}
-                  className={styles.menu_item}
-                  activeClassName="route_active"
-                >
-                  <Icon type={item.icon} />
-                  <span>{item.name}</span>
-                </NavLink>
-              ))
-            }
+      <Transition name="slide-left-100">
+        <div className={styles.g_sider} key={getParentPathname(pathname)}>
+          {getSiderHd(pathname)}
+          <div className={styles.content}>
+            <div className={styles.menus}>
+              {
+                childRoutes.map(item => (
+                  <NavLink
+                    key={item.key}
+                    to={`/${currentMenu.key}/${item.key}`}
+                    className={styles.menu_item}
+                    activeClassName="route_active"
+                  >
+                    <Icon type={item.icon} />
+                    <span>{item.name}</span>
+                  </NavLink>
+                ))
+              }
+            </div>
           </div>
         </div>
-      </div>
+      </Transition>
     ) : null
   )
 }

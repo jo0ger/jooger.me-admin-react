@@ -7,8 +7,8 @@ import styles from './ListFilter.styl'
 const Search = Input.Search
 
 export const ListFilter = (props) => {
-  const { onSearch, OnInput, sorterMenus, onMenuClick } = props
-  const onChange = e => OnInput(e.target.value)
+  const { onSearch, onInput, sorterMenus, selectedSorterKeys, onMenuClick } = props
+  const onChange = e => onInput && onInput(e.target.value)
   const onSearchInput = val => onSearch(val.trim())
   return (
     <div className={styles.list_filter}>
@@ -23,8 +23,8 @@ export const ListFilter = (props) => {
         <DropOption
           buttonClass="sorter_btn"
           menuIcon="bars"
-          menuStyle={{width: 100}}
           menuOptions={sorterMenus}
+          selectedKeys={selectedSorterKeys}
           buttonStyle={{ display: 'block', width: 50, textAlign: 'center' }}
           onMenuClick={onMenuClick}
         />
@@ -37,7 +37,7 @@ ListFilter.propTypes = {
   sorterMenus: PropTypes.array.isRequired,
   onMenuClick: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
-  OnInput: PropTypes.func.isRequired
+  onInput: PropTypes.func
 }
 
 export default ListFilter

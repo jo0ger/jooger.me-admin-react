@@ -1,0 +1,138 @@
+@import '../../styles/vars/index'
+
+$fade               = fade
+$slide-left         = slide-left
+$slide-left-100     = slide-left-100
+$create-at          = create-at
+
+:global {
+  .{$fade} {
+    &-appear {
+      opacity: 0;
+
+      &.{$fade}-appear-active {
+        opacity: 1;
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-enter {
+      opacity: 0;
+
+      &.{$fade}-enter-active {
+        opacity: 1;
+        transition: $transition-ease-out;
+      }
+    }
+    
+    &-leave {
+      opacity: 1;
+
+      &.{$fade}-leave-active {
+        opacity: 0;
+        transition: $transition-ease-out;
+      }
+    }
+  }
+
+  .{$slide-left} {
+
+    &-appear {
+      opacity: 0;
+      transform: translate3d(-20px, 0, 0);
+
+      &.{$slide-left}-appear-active {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-enter {
+      opacity: 0;
+      transform: translate3d(-20px, 0, 0);
+
+      &.{$slide-left}-enter-active {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-leave {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+
+      &.{$slide-left}-leave-active {
+        opacity: 0;
+        transform: translate3d(-20px, 0, 0);
+        transition: $transition-ease-out;
+      }
+
+    }
+  }
+
+  .{$slide-left-100} {
+
+    &-appear {
+      opacity: 0;
+      transform: translate3d(-100%, 0, 0);
+
+      &.{$slide-left-100}-appear-active {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-enter {
+      opacity: 0;
+      transform: translate3d(-100%, 0, 0);
+
+      &.{$slide-left-100}-enter-active {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-leave {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+
+      &.{$slide-left-100}-leave-active {
+        opacity: 0;
+        transform: translate3d(-100%, 0, 0);
+        transition: $transition-ease-out;
+      }
+
+    }
+  }
+
+  .{$create-at} {
+
+    &-enter {
+      opacity: 0;
+      height: 0;
+
+      &.{$create-at}-enter-active {
+        opacity: 1;
+        height: 160px;
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-leave {
+      opacity: 1;
+      height: 160px;
+
+      &.{$create-at}-leave-active {
+        opacity: 0;
+        height: 0;
+        transition: $transition-ease-out;
+      }
+
+    }
+  }
+
+}

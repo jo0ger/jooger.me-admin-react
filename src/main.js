@@ -12,10 +12,10 @@ const renderApp = (DevTools = null) => {
   const routes = createRoutes(store)
   
   if (__DEV__) {
-    const DevTools = require('~components/DevTools').default
+    // const DevTools = require('~components/DevTools').default
     render(
       <AppContainer store={store} routes={routes}>
-        <DevTools />
+        {/*<DevTools />*/}
       </AppContainer>,
       MOUNT_NODE
     )
@@ -32,11 +32,11 @@ const renderApp = (DevTools = null) => {
 // ========================================================
 // Developer Tools Setup
 // ========================================================
-if (__DEV__) {
-  if (window.devToolsExtension) {
-    window.devToolsExtension.open()
-  }
-}
+// if (__DEV__) {
+//   if (window.devToolsExtension) {
+//     window.devToolsExtension.open()
+//   }
+// }
 
 // START RENDER APP
 renderApp()

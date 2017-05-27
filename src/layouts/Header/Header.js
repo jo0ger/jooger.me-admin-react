@@ -8,7 +8,7 @@ export const Header = () => {
     <div className={styles.g_header}>
       <div className={styles.wrap}>
         <div className={styles.logo}>
-          <div className={styles.logo_wrap}></div>
+          <div className={styles.logo_wrap} />
         </div>
         <nav className={styles.nav}>
           {
@@ -16,7 +16,7 @@ export const Header = () => {
               <NavLink
                 key={item.key}
                 className={styles.nav_item}
-                to={`/${item.key}`} key={item.key}
+                to={`/${item.key}`}
                 activeClassName="route_active"
               >
                 {item.name}

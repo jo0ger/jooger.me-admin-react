@@ -55,7 +55,7 @@ const Service = {
   auth: {
     login: wrap('post', '/auth'),
     getInfo: wrap('get', '/auth'),
-    modifyInfo: wrap('put', '/auth')
+    editInfo: wrap('put', '/auth')
   },
   stat: {
     getStat: wrap('get', '/statistics')
@@ -66,7 +66,7 @@ const Service = {
     batchUpdate: wrap('patch', '/article'),
     batchDelete: wrap('delete', '/article'),
     getItem: id => wrap('get', `/article/${id}`),
-    modifyItem: id => wrap('put', `/article/${id}`),
+    editItem: id => wrap('put', `/article/${id}`),
     changeItemState: id => wrap('patch', `/article/${id}`),
     deleteItem: id => wrap('delete', `/article/${id}`)
   },
@@ -75,7 +75,7 @@ const Service = {
     create: wrap('post', '/category'),
     batchDelete: wrap('delete', '/category'),
     getItem: id => wrap('get', `/category/${id}`),
-    modifyItem: id => wrap('put', `/category/${id}`),
+    editItem: id => wrap('put', `/category/${id}`),
     deleteItem: id => wrap('delete', `/category/${id}`)
   },
   tag: {
@@ -83,13 +83,13 @@ const Service = {
     create: wrap('post', '/tag'),
     batchDelete: wrap('delete', '/tag'),
     getItem: id => wrap('get', `/tag/${id}`),
-    modifyItem: id => wrap('put', `/tag/${id}`),
+    editItem: id => wrap('put', `/tag/${id}`),
     deleteItem: id => wrap('delete', `/tag/${id}`)
   },
   option: {
     getInfo: wrap('get', '/option'),
     create: wrap('post', '/option'),
-    modifyInfo: wrap('put', '/option'),
+    editInfo: wrap('put', '/option'),
   }
 }
 

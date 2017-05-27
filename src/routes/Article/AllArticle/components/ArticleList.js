@@ -12,9 +12,9 @@ const findCategoryExtendsItemValue = (extendsList = [], key = '') => {
 }
 
 const allToolMenus = [
-  { key: 'upblish', name: '发布', status: 1 },
-  { key: 'draft', name: '草稿箱', status: 0 },
-  { key: 'delete', name: '回收站', status: -1 }
+  { key: 'publish', name: '发布', icon: 'upload', status: 1 },
+  { key: 'draft', name: '草稿箱', icon: 'copy', status: 0 },
+  { key: 'delete', name: '回收站', icon: 'delete', status: -1 }
 ]
 
 const getcurrentToolMenus = (status) => allToolMenus.filter(item => item.status !== status || item.status === 'always')
@@ -26,9 +26,7 @@ export class ArticleList extends Component {
 
   handleItemSlected = id => this.props.onItemSelected(id)
 
-  handleToolMenuClick = (item, key, keyPath) => {
-    console.log(item, key, keyPath)
-  }
+  handleToolMenuClick = id => item => this.props.onToolClick(item.key, id)
 
   render () {
     const { articleList, currentId } = this.props
@@ -61,13 +59,13 @@ export class ArticleList extends Component {
                     : null
                 }
                 <div className={styles.title}>
-                  <span>{item.title}</span>
+                  <span title={item.title}>{item.title}</span>
                 </div>
                 <div className={styles.tool}>
                   <DropOption
                     menuOptions={getcurrentToolMenus(item.state)}
                     buttonStyle={{ width: 20, textAlign: 'center' }}
-                    onMenuClick={this.handleToolMenuClick}
+                    onMenuClick={this.handleToolMenuClick(item._id)}
                   />
                 </div>
               </div>
@@ -81,9 +79,7 @@ export class ArticleList extends Component {
                   <span className={styles.text}>{fmtDate(item.update_at)}</span>
                 </div>
               </div>
-              <div className={styles.meta}>
-                
-              </div>
+              <div className={styles.meta}></div>
             </ListItem>
           ))
         }
@@ -96,7 +92,8 @@ ArticleList.propTypes = {
   articleList: PropTypes.array.isRequired,
   pagination: PropTypes.object.isRequired,
   currentId: PropTypes.string.isRequired,
-  onItemSelected: PropTypes.func
+  onItemSelected: PropTypes.func,
+  onToolClick: PropTypes.func
 }
 
 export default ArticleList

@@ -1,6 +1,17 @@
 // 文章列表
 
 import Service from '~service'
+import { message } from 'antd'
+import { isType } from '~utils'
+
+// 现在是否有任务在进行
+const isProcessCarryOut = ({ article: { fetching, saving, deleting } }) => {
+  const isProcessing = fetching || saving || deleting
+  return isProcessing ? (
+    message.warning('当前有文章任务在进行，请勿操作'),
+    isProcessing
+  ) : isProcessing
+}
 
 // ------------------------------------
 // Article List 请求
@@ -10,14 +21,15 @@ const FETCH_ARTICLE_LIST_SUCCESS = 'FETCH_ARTICLE_LIST_SUCCESS'
 const FETCH_ARTICLE_LIST_FAILURE = 'FETCH_ARTICLE_LIST_FAILURE'
 
 // list请求开始
-export const requestList = () => ({
-  type: FETCH_ARTICLE_LIST_REQUEST
+export const requestList = refresh => ({
+  type: FETCH_ARTICLE_LIST_REQUEST,
+  payload: refresh
 })
 
 // list请求成功
-export const requestListSuccess = (data, filter, sorter, refresh) => ({
+export const requestListSuccess = (data, refresh) => ({
   type: FETCH_ARTICLE_LIST_SUCCESS,
-  payload: { ...data, filter, sorter, refresh }
+  payload: { ...data, refresh }
 })
 
 // list请求失败
@@ -28,17 +40,16 @@ export const requestListFailure = err => ({
 
 // 请求
 // refresh 是否刷新列表 default: false
-export const fetchArticleList = (params = {}, filter = {}, sorter = {}, refresh = false) => (dispatch, getState) => {
-  if (getState().article.fetching) {
-    // TODO 提示 请勿频繁操作？？？
+export const fetchArticleList = (params = {}, refresh = false) => (dispatch, getState) => {
+  if (isProcessCarryOut(getState())) {
     return
   }
   // 请求开始
-  dispatch(requestList())
+  dispatch(requestList(refresh))
   return Service.article.getList({ params }).then(({ code, data }) => {
     if (!code) {
       // 请求成功
-      dispatch(requestListSuccess(data, filter, sorter, refresh))
+      dispatch(requestListSuccess(data, refresh))
     }
     return code
   }).catch(err => {
@@ -64,6 +75,45 @@ export const viewArticleItem = currentId => ({
 const EDIT_ARTICLE_ITEM_REQUEST = 'EDIT_ARTICLE_ITEM_REQUEST'
 const EDIT_ARTICLE_ITEM_SUCCESS = 'EDIT_ARTICLE_ITEM_SUCCESS'
 const EDIT_ARTICLE_ITEM_FAILURE = 'EDIT_ARTICLE_ITEM_FAILURE'
+
+export const editArticleRequest = () => ({
+  type: EDIT_ARTICLE_ITEM_REQUEST
+})
+
+export const editArticleFailure = err => ({
+  type: EDIT_ARTICLE_ITEM_FAILURE,
+  payload: err
+})
+
+export const editArticleSuccess = ({id, data, status}) => ({
+  type: EDIT_ARTICLE_ITEM_SUCCESS,
+  payload: { id, data, status }
+})
+
+// 分两种
+// 1. 批量状态修改 （只是article的状态）
+// 2. 单篇内容修改 （包含article其他内容，不仅是状态）
+export const editArticleItem = (params = {}, id, status) => (dispatch, getState) => {
+  if (isProcessCarryOut(getState())) {
+    return
+  }
+  if (isType(id, 'array')) {
+    return Service.article.batchUpdate({
+      article_ids: id,
+      state: status
+    }).then(({ code }) => {
+      if (!code) {
+        dispatch(editArticleSuccess({id, status}))
+      }
+    }).catch(err => dispatch(editArticleFailure(err)))
+  }
+  return Service.article.editItem(id)(params).then(({ code, data }) => {
+    if (!code) {
+      dispatch(editArticleSuccess({id, data}))
+    }
+    return code
+  }).catch(err => dispatch(editArticleFailure(err)))
+}
 
 // TODO
 
@@ -92,7 +142,7 @@ export const deleteArticleSuccess = ({index}) => ({
 // 但是目前只用到了2，因为其实就是将单篇的id包装成一个数组而已
 // 目前未找到用1的场景，但这里先写下了
 export const deleteArticleItem = (params = {}, id, index) => (dispatch, getState) => {
-  if (getState().article.deleting) {
+  if (isProcessCarryOut(getState())) {
     return
   }
   dispatch(deleteArticleRequest())
@@ -123,28 +173,56 @@ export const deleteArticleItem = (params = {}, id, index) => (dispatch, getState
 // ACTION HANDLERS
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [FETCH_ARTICLE_LIST_REQUEST]: state => ({
+  [FETCH_ARTICLE_LIST_REQUEST]: (state, refresh) => ({
     ...state,
-    fetching: true
+    [refresh ? 'refreshing' : 'fetching']: true
   }),
-  [FETCH_ARTICLE_LIST_SUCCESS]: (state, { list, pagination, filter, sorter, refresh }) => {
+  [FETCH_ARTICLE_LIST_SUCCESS]: (state, { list, pagination, refresh }) => {
     return {
       ...state,
+      refreshing: false,
       fetching: false,
       list: refresh ? list : [...state.list, ...list],
-      pagination,
-      filter,
-      sorter
+      pagination
     }
   },
   [FETCH_ARTICLE_LIST_FAILURE]: (state, err) => ({
     ...state,
+    refreshing: false,
     fetching: false
   }),
   [VIEW_ARTICLE_ITEM]: (state, currentId) => ({
     ...state,
     currentId
   }),
+  [EDIT_ARTICLE_ITEM_REQUEST]: state => ({
+    ...state,
+    saving: true
+  }),
+  [EDIT_ARTICLE_ITEM_FAILURE]: state => ({
+    ...state,
+    saving: false
+  }),
+  [EDIT_ARTICLE_ITEM_SUCCESS]: (state, { id, data, status }) => {
+    const articleList = [...state.list]
+    if (isType(id, 'array')) {
+      // 批量修改状态
+      id.map(article_id => {
+        let index = state.list.findIndex(item => item._id === article_id)
+        articleList[index].state = status
+        return article_id
+      })
+    } else {
+      // 单片修改内容
+      const index = state.list.findIndex(item => item._id === id)
+      articleList.splice(index, 1, data)
+    }
+    return {
+      ...state,
+      saving: false,
+      list: articleList
+    }
+  },
   [DELETE_ARTICLE_ITEM_REQUEST]: state => ({
     ...state,
     deleting: true
@@ -155,7 +233,6 @@ const ACTION_HANDLERS = {
   }),
   [DELETE_ARTICLE_ITEM_SUCCESS]: (state, index) => {
     let articleList = [...state.list]
-    // 单篇内容修改
     articleList.splice(index, 1)
     return {
       ...state,
@@ -172,10 +249,9 @@ const initialState = {
   fetching: false,    // 列表获取状态
   saving: false,      // 列表保存状态
   deleting: false,    // 列表删除状态
+  refreshing: false,  // 列表刷新状态
   list: [],           // 列表LIST
   pagination: {},     // 列表分页信息
-  filter: {},         // 列表过滤信息
-  sorter: {},         // 列表排序信息
   currentId: ''       // 当前正在查看/编辑的文章ID
 }
 export default function articleListReducer (state = initialState, action) {

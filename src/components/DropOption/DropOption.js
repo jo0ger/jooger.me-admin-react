@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Dropdown, Icon, Menu } from 'antd'
+import styles from './DropOption.styl'
 import { classnames, buildClassName, noop } from '~utils'
 
 const MenuDevider = Menu.Divider
@@ -9,8 +10,10 @@ const DropOption = ({
   menuIcon = '',
   menuText = null,
   menuStyle = {},
+  theme = 'dark',
   onMenuClick = noop,
   menuOptions = [],
+  selectedKeys = [],
   buttonStyle = {},
   buttonClass = '',
   dropdownProps = {}
@@ -19,6 +22,9 @@ const DropOption = ({
     item.key === 'divider'
       ? <MenuDevider />
       : <Menu.Item style={menuStyle} {...item.props} key={item.key}>
+          {
+            item.icon ? <Icon className={styles.menu_item_icon} type={item.icon} /> : null
+          }
           {item.name}
         </Menu.Item>
   ))
@@ -27,7 +33,7 @@ const DropOption = ({
   return (
     <Dropdown
       placement="bottomCenter"
-      overlay={<Menu onClick={onMenuClick}>{menu}</Menu>}
+      overlay={<Menu theme={theme} selectedKeys={selectedKeys} onClick={onMenuClick}>{menu}</Menu>}
       {...dropdownProps}
     >
     <a className={classnames(className)} style={{ border: 'none', ...buttonStyle }}>

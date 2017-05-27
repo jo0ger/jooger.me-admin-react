@@ -6,6 +6,7 @@ module.exports = [
   {
     key: 'article',
     name: '文章管理',
+    default: 'all',
     children: [
       {
         key: 'all',
@@ -32,8 +33,14 @@ module.exports = [
   {
     key: 'other',
     name: '其他管理',
+    default: 'setting',
     icon: 'appstore-o',
     children: [
+      {
+        key: 'setting',
+        name: '配置管理',
+        icon: 'setting'
+      },
       {
         key: 'music',
         name: '音乐管理',
@@ -48,11 +55,6 @@ module.exports = [
         key: 'gallery',
         name: '图片管理',
         icon: 'picture'
-      },
-      {
-        key: 'setting',
-        name: '配置管理',
-        icon: 'setting'
       }
     ]
   }

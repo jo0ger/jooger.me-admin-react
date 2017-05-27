@@ -26,6 +26,13 @@ export const createRoutes = store => {
         }
       },
       {
+        redirect: {
+          from: '/article',
+          to: '/article/all',
+          push: false
+        }
+      },
+      {
         path: '/home',
         name: 'Home',
         component: Home,
@@ -34,6 +41,12 @@ export const createRoutes = store => {
       {
         path: '/article/all',
         name: 'AllArticle',
+        component: bundleAsyncRoute(AllArticleLoader(store)),
+        exact: true
+      },
+      {
+        path: '/article/category',
+        name: 'Category',
         component: bundleAsyncRoute(AllArticleLoader(store)),
         exact: true
       },
