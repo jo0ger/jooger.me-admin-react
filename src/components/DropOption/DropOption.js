@@ -1,11 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Dropdown, Button, Icon, Menu } from 'antd'
-import { classnames, isType } from '~utils'
+import { Dropdown, Icon, Menu } from 'antd'
+import { classnames, buildClassName, noop } from '~utils'
 
 const MenuDevider = Menu.Divider
 
-const DropOption = ({ menuIcon = '', menuText = null, menuStyle = {}, onMenuClick, menuOptions = [], buttonStyle = {}, buttonClass = {}, dropdownProps = {} }) => {
+const DropOption = ({
+  menuIcon = '',
+  menuText = null,
+  menuStyle = {},
+  onMenuClick = noop,
+  menuOptions = [],
+  buttonStyle = {},
+  buttonClass = '',
+  dropdownProps = {}
+}) => {
   const menu = menuOptions.map(item => (
     item.key === 'divider'
       ? <MenuDevider />
@@ -13,13 +22,11 @@ const DropOption = ({ menuIcon = '', menuText = null, menuStyle = {}, onMenuClic
           {item.name}
         </Menu.Item>
   ))
-  const className = isType(buttonClass, 'object')
-    ? {...buttonClass}
-    : isType(buttonClass, 'array')
-      ? [...buttonClass]
-      : buttonClass
+  const className = buildClassName(buttonClass)
+
   return (
     <Dropdown
+      placement="bottomCenter"
       overlay={<Menu onClick={onMenuClick}>{menu}</Menu>}
       {...dropdownProps}
     >
@@ -32,10 +39,17 @@ const DropOption = ({ menuIcon = '', menuText = null, menuStyle = {}, onMenuClic
 }
 
 DropOption.propTypes = {
+  menuIcon: PropTypes.string,
   menuText: PropTypes.string,
-  onMenuClick: PropTypes.func.isRequired,
+  menuStyle: PropTypes.object,
+  onMenuClick: PropTypes.func,
   menuOptions: PropTypes.array,
   buttonStyle: PropTypes.object,
+  buttonClass: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.string,
+    PropTypes.array
+  ]),
   dropdownProps: PropTypes.object,
 }
 

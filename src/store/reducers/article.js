@@ -28,7 +28,7 @@ export const requestListFailure = err => ({
 
 // 请求
 // refresh 是否刷新列表 default: false
-export const fetchArticleList = (params = {}, filter = {}, sorter = {}, refresh = true) => (dispatch, getState) => {
+export const fetchArticleList = (params = {}, filter = {}, sorter = {}, refresh = false) => (dispatch, getState) => {
   if (getState().article.fetching) {
     // TODO 提示 请勿频繁操作？？？
     return
@@ -47,6 +47,16 @@ export const fetchArticleList = (params = {}, filter = {}, sorter = {}, refresh 
     return err
   })
 }
+
+// ------------------------------------
+// Article Item 查看
+// ------------------------------------
+const VIEW_ARTICLE_ITEM = 'VIEW_ARTICLE_ITEM'
+
+export const viewArticleItem = currentId => ({
+  type: VIEW_ARTICLE_ITEM,
+  payload: currentId
+})
 
 // ------------------------------------
 // Article Item 编辑
@@ -131,6 +141,10 @@ const ACTION_HANDLERS = {
     ...state,
     fetching: false
   }),
+  [VIEW_ARTICLE_ITEM]: (state, currentId) => ({
+    ...state,
+    currentId
+  }),
   [DELETE_ARTICLE_ITEM_REQUEST]: state => ({
     ...state,
     deleting: true
@@ -161,7 +175,8 @@ const initialState = {
   list: [],           // 列表LIST
   pagination: {},     // 列表分页信息
   filter: {},         // 列表过滤信息
-  sorter: {}          // 列表排序信息
+  sorter: {},         // 列表排序信息
+  currentId: ''       // 当前正在查看/编辑的文章ID
 }
 export default function articleListReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

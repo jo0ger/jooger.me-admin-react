@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import Page from '~components/Page'
 import ListFilter from '~components/ListFilter'
 import ArticleList from './ArticleList'
-import styles from '../assets/AllArticle.styl'
+import InfiniteScroll from '~components/InfiniteScroll'
+import styles from '../assets/AllArticle'
 
 const sorterMenus = [
   { key: 'create_at', name: '创建时间' },
@@ -17,10 +18,10 @@ export class AllArticle extends Component {
   }
 
   componentWillMount () {
-    this._init()
+    this.init()
   }
 
-  _init () {
+  init () {
     const { articleList, fetchArticleList } = this.props
     if (articleList && articleList.length) {
       return
@@ -28,16 +29,25 @@ export class AllArticle extends Component {
     fetchArticleList()
   }
 
+  setListContainer = el => this._listContainer = el
+
   handlerSorterMenuClick = () => {}
 
   handlerSearch = (val) => {}
 
   handleFilterInput = (val) => {}
 
+  handleLoadmore = e => {
+    const { fetchArticleList, pagination } = this.props
+    fetchArticleList({
+      page: pagination.current_page + 1
+    })
+  }
+
   render () {
-    const { articleList, pagination } = this.props
+    const { articleList, pagination, currentId } = this.props
     return (
-      <Page className={styles.page_all_article}>
+      <Page customClassName={styles.page_all_article}>
         <div className={styles.list_view}>
           <ListFilter
             sorterMenus={sorterMenus}
@@ -45,12 +55,17 @@ export class AllArticle extends Component {
             OnInput={this.handleFilterInput}
             onSearch={this.handlerSearch}
           />
-          <div className={styles.list_content}>
+          <InfiniteScroll
+            customClassName={[styles.list_content]}
+            onLoadmore={this.handleLoadmore}
+          >
             <ArticleList
               articleList={articleList}
               pagination={pagination}
+              currentId={currentId}
+              onItemSelected={this.props.viewArticleItem}
             />
-          </div>
+          </InfiniteScroll>
         </div>
         <div className={styles.detail_view}></div>
       </Page>
@@ -67,7 +82,8 @@ AllArticle.propTypes = {
   saving: PropTypes.bool.isRequired,
   deleting: PropTypes.bool.isRequired,
   fetchArticleList: PropTypes.func.isRequired,
-  deleteArticleItem: PropTypes.func.isRequired
+  deleteArticleItem: PropTypes.func.isRequired,
+  viewArticleItem: PropTypes.func.isRequired
 }
 
 export default AllArticle

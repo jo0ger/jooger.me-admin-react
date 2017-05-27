@@ -7,9 +7,15 @@
   border-bottom: 1px solid rgba($black, .06);
   overflow: hidden;
   transition: $transition-ease-out;
+  cursor: default;
 
   &:hover {
     background-color: $grey-2;
+  }
+
+  &.item_selected {
+    color: $blue-6;
+    background-color: $blue-1;
   }
 
 }

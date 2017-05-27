@@ -71,6 +71,18 @@ export const isType = (obj = {}, type = 'object') => {
   return Object.prototype.toString.call(obj) === `[object ${firstUpperCase(type)}]`
 }
 
+export const noop = function () {}
+
+export const buildClassName = (className = '') => {
+  let obj = {}
+  isType(className, 'object')
+    ? (obj = {...className})
+    : isType(className, 'array')
+      ? className.forEach(item => obj[item] = true)
+      : (obj = { [className]: true })
+  return obj
+}
+
 export {
   classnames,
   marked

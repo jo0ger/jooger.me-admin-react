@@ -16,27 +16,30 @@ const createBtn = {
   '/article/tag': { text: '新建标签' }
 }
 
-const getCreateBtn = pathname => {
+const getSiderHd = pathname => {
   return (
     createBtn[pathname]
-      ? <span>{createBtn[pathname].text}</span>
+      ? (
+        <div className={styles.hd}>
+          <div className={styles.create_btn}>
+            <Icon type="plus" />
+            <span>{createBtn[pathname].text}</span>
+          </div>
+        </div>
+      )
       : null
   )
 }
 
 export const Sider = ({ location }) => {
-  const currentMenu = menu.find(item => location.pathname.includes(item.key))
-  const childRoutes = getChildRoutes(currentMenu.key)
-  
+  const pathname = location.pathname
+  const currentMenu = menu.find(item => pathname.includes(item.key))
+  const childRoutes = getChildRoutes(currentMenu ? currentMenu.key : '')
+
   return (
     childRoutes ? (
       <div className={styles.g_sider}>
-        <div className={styles.hd}>
-          <div className={styles.create_btn}>
-            <Icon type="plus" />
-            {getCreateBtn(location.pathname)}
-          </div>
-        </div>
+        {getSiderHd(pathname)}
         <div className={styles.content}>
           <div className={styles.menus}>
             {
