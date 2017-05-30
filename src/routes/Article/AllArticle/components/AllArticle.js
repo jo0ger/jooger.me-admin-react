@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 import Page from '~components/Page'
 import ListFilter from '~components/ListFilter'
 import ArticleList from './ArticleList'
-import ArticleDetail from './ArticleDetail'
+import ArticleDetail from '../containers/ArticleDetailContainer'
 import InfiniteScroll from '~components/InfiniteScroll'
+import NoData from '~components/NoData'
 import { Loading, ListReFreshLoading } from '~components/Loading'
 import styles from '../assets/AllArticle'
 
@@ -28,14 +29,18 @@ export class AllArticle extends Component {
   }
 
   init () {
-    const { articleList, fetchArticleList } = this.props
+    const { articleList, fetchArticleList, fetchCategoryList, fetchTagList } = this.props
     if (articleList && articleList.length) {
       return
     }
     fetchArticleList({}, true)
+    fetchCategoryList()
+    fetchTagList()
   }
 
   setListContainer = el => this._listContainer = el
+
+  getCurrentArticle = () => this.props.articleList.find(item => item._id === this.props.currentArticleId) || {}
 
   handleSorterMenuClick = (item) => {
     let sort = {}
@@ -89,6 +94,11 @@ export class AllArticle extends Component {
     })
   }
 
+  handleViewArticleItem = id => {
+    const { currentArticleId, viewArticleItem } = this.props
+    viewArticleItem(id === currentArticleId ? '' : id)
+  }
+
   handleArticleToolClick = (key, id) => {
     let state = 1
     switch (key) {
@@ -118,7 +128,7 @@ export class AllArticle extends Component {
   }
 
   render () {
-    const { refreshing, fetching, articleList, pagination, currentId, viewArticleItem } = this.props
+    const { refreshing, fetching, articleList, pagination, currentArticleId } = this.props
     return (
       <Page customClassName={styles.page_all_article}>
         <div className={styles.list_view}>
@@ -137,13 +147,11 @@ export class AllArticle extends Component {
                 ? <ArticleList
                     articleList={articleList}
                     pagination={pagination}
-                    currentId={currentId}
-                    onItemSelected={viewArticleItem}
+                    currentArticleId={currentArticleId}
+                    onItemSelected={this.handleViewArticleItem}
                     onToolClick={this.handleArticleToolClick}
                   />
-                : !fetching
-                  ? <p className={styles.no_data}>NO ARTICLE DATA</p>
-                  : null
+                : <NoData show={!fetching} text="NO ARTICLE DATA" iconSize={36} />
             }
             <ListReFreshLoading loading={refreshing} />
             <Loading className={styles.loadmore_loading} loading={fetching} />
@@ -167,10 +175,13 @@ AllArticle.propTypes = {
   fetching: PropTypes.bool.isRequired,
   saving: PropTypes.bool.isRequired,
   deleting: PropTypes.bool.isRequired,
+  currentArticleId: PropTypes.string,
   fetchArticleList: PropTypes.func.isRequired,
   editArticleItem: PropTypes.func.isRequired,
   deleteArticleItem: PropTypes.func.isRequired,
-  viewArticleItem: PropTypes.func.isRequired
+  viewArticleItem: PropTypes.func.isRequired,
+  fetchCategoryList: PropTypes.func.isRequired,
+  fetchTagList: PropTypes.func.isRequired
 }
 
 export default AllArticle

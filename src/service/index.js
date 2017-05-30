@@ -62,7 +62,7 @@ const Service = {
   },
   article: {
     getList: wrap('get', '/article'),
-    publish: wrap('post', '/article'),
+    create: wrap('post', '/article'),
     batchUpdate: wrap('patch', '/article'),
     batchDelete: wrap('delete', '/article'),
     getItem: id => wrap('get', `/article/${id}`),

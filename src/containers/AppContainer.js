@@ -15,35 +15,41 @@ class AppContainer extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return false
   }
+
+  layoutRender = ({ location }) => {
+    const { routes } = this.props
+    const Layout = routes.component
+    const childRoutes = routes.childRoutes
+
+    return (
+      <Layout>
+        <Transition name="fade">
+          <Switch key={location.key}>
+            {
+              childRoutes.map((route, index) => {
+                return (
+                  route.redirect ? (
+                    <Redirect {...route.redirect} key={index} exact />
+                  ) : (
+                    <Route {...route} key={index} />
+                  )
+                )
+              })
+            }
+          </Switch>
+        </Transition>
+      </Layout>
+    )
+  }
   
   render () {
     const { store, routes } = this.props
-    const Layout = routes.component
-    const childRoutes = routes.childRoutes
 
     return (
       <Provider store={store}>
         <div className="app">
           <Router basename={routes.basename || '/'}>
-            <Route render={({ location }) => (
-              <Layout>
-                <Transition name="fade">
-                  <Switch key={location.key}>
-                    {
-                      childRoutes.map((route, index) => {
-                        return (
-                          route.redirect ? (
-                            <Redirect {...route.redirect} key={index} exact />
-                          ) : (
-                            <Route {...route} key={index} />
-                          )
-                        )
-                      })
-                    }
-                  </Switch>
-                </Transition>
-              </Layout>
-            )}/>
+            <Route render={this.layoutRender} />
           </Router>
           { this.props.children }
         </div>

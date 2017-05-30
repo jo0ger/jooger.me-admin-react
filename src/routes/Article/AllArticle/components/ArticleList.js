@@ -21,15 +21,12 @@ const getcurrentToolMenus = (status) => allToolMenus.filter(item => item.status 
 
 export class ArticleList extends Component {
 
-  handleItemActive = id => {
-  }
-
   handleItemSlected = id => this.props.onItemSelected(id)
 
   handleToolMenuClick = id => item => this.props.onToolClick(item.key, id)
 
   render () {
-    const { articleList, currentId } = this.props
+    const { articleList, currentArticleId } = this.props
     return (
       <div className={styles.article_list}>
         {
@@ -43,9 +40,8 @@ export class ArticleList extends Component {
               })}
               key={item._id}
               id={item._id}
-              selected={currentId === item._id}
+              selected={currentArticleId === item._id}
               onSelected={this.handleItemSlected}
-              onActive={this.handleItemActive}
             >
               <div className={styles.hd}>
                 {
@@ -79,7 +75,7 @@ export class ArticleList extends Component {
                   <span className={styles.text}>{fmtDate(item.update_at)}</span>
                 </div>
               </div>
-              <div className={styles.meta}></div>
+              <div className={styles.meta} />
             </ListItem>
           ))
         }
@@ -91,7 +87,7 @@ export class ArticleList extends Component {
 ArticleList.propTypes = {
   articleList: PropTypes.array.isRequired,
   pagination: PropTypes.object.isRequired,
-  currentId: PropTypes.string.isRequired,
+  currentArticleId: PropTypes.string.isRequired,
   onItemSelected: PropTypes.func,
   onToolClick: PropTypes.func
 }

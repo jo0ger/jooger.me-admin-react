@@ -1,3 +1,3 @@
-import Sider from './Sider'
+import Sider from './SiderContainer'
 
 export default Sider

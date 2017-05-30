@@ -2,9 +2,11 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import AllArticle from '../components/AllArticle'
 import { fetchArticleList, editArticleItem, deleteArticleItem, viewArticleItem } from '~store/reducers/article'
+import { fetchCategoryList } from '~store/reducers/category'
+import { fetchTagList } from '~store/reducers/tag'
 
 const mapStateToProps = state => {
-  const { list, pagination, refreshing, fetching, saving, deleting, currentId } = state.article
+  const { list, pagination, refreshing, fetching, saving, deleting, currentArticleId } = state.article
   return {
     articleList: list,
     pagination,
@@ -12,7 +14,7 @@ const mapStateToProps = state => {
     fetching,
     saving,
     deleting,
-    currentId
+    currentArticleId
   }
 }
 
@@ -20,7 +22,9 @@ const mapDispatchToProps = {
   fetchArticleList,
   editArticleItem,
   deleteArticleItem,
-  viewArticleItem
+  viewArticleItem,
+  fetchCategoryList,
+  fetchTagList
 }
 
 

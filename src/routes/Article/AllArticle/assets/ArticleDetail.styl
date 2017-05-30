@@ -4,14 +4,117 @@
 .article_detail {
 
   .hd {
+    flex(, flex-start)
     position: relative;
     height: 60px;
     padding: $btn-padding-base;
     border-bottom: 1px solid rgba($black, .06);
   }
 
-  .bd {
-    
+  .title {
+    flex-grow: 1;
+    .title_input, .title_text {
+      width: 100%;
+      height: 59px;
+      line-height: 59px;
+      padding: 18px 0;
+      font-size: 18px;
+      textOverflow()
+    }
+
+    .title_text {
+      color: $blue-6;
+    }
+
+    .title_input {
+      border: none;
+      outline: none;
+    }
   }
 
+  .actions {
+    margin-right: 10px;
+    .cancle_btn {
+      margin-left: 10px;
+    }
+
+  }
+
+  .meta {
+    margin-right: 10px;
+
+    .meta_btn {
+      font-size: 18px;
+      border: none;
+    }
+  }
+
+  .comment {
+    margin-right: 10px;
+
+    .comment_btn {
+      font-size: 18px;
+      border: none;
+    }
+  }
+
+  .bd {
+    full()
+    top: 60px;
+
+    .info {
+      padding: 16px;
+      border-bottom: 1px solid rgba($black, .06);
+    }
+
+    .state_checked {
+      color: $white;
+
+      &.publish_state {
+        border-color: $green-6;
+        box-shadow: -1px 0 0 0 $green-6;
+        background-color: $green-6;
+      }
+
+      &.draft_state {
+        border-color: $yellow-6;
+        box-shadow: -1px 0 0 0 $yellow-6;
+        background-color: $yellow-6;
+      }
+
+      &.delete_state {
+        border-color: $red-6;
+        box-shadow: -1px 0 0 0 $red-6;
+        background-color: $red-6;
+      }
+    }
+
+    .category_wrap, .tag_wrap {
+      max-height: 200px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+
+}
+
+.meta_info {
+  flex(column, ,flex-start)
+  width: 180px;
+
+  .key, .value {
+    display: inline-block;
+    height: 28px;
+    line-height: 28px;
+    text-align: left;
+  }
+  .key {
+    width 66px;
+    flex-shrink: 0;
+    font-weight: bold;
+  }
+  .value {
+    flex-grow: 1;
+    color: $text-color-secondary;
+  }
 }

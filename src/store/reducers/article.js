@@ -4,9 +4,26 @@ import Service from '~service'
 import { message } from 'antd'
 import { isType } from '~utils'
 
+const defaultArticleModel = {
+  title: '这是一篇新文章',
+  content: '这是新文章的内容',
+  excerpt: '',
+  keywords: [],
+  thumbs: [],
+  state: 0,
+  category: '',
+  tag: [],
+  meta: {
+    visit: 0,
+    likes: 0,
+    comments: 0
+  },
+  extends: []
+}
+
 // 现在是否有任务在进行
-const isProcessCarryOut = ({ article: { fetching, saving, deleting } }) => {
-  const isProcessing = fetching || saving || deleting
+const isProcessCarryOut = ({ article: { creating, fetching, saving, deleting } }) => {
+  const isProcessing = creating || fetching || saving || deleting
   return isProcessing ? (
     message.warning('当前有文章任务在进行，请勿操作'),
     isProcessing
@@ -60,13 +77,47 @@ export const fetchArticleList = (params = {}, refresh = false) => (dispatch, get
 }
 
 // ------------------------------------
+// Article Item 新建
+// ------------------------------------
+const CREATE_ARTICLE_ITEM_REQUEST = 'CREATE_ARTICLE_ITEM_REQUEST'
+const CREATE_ARTICLE_ITEM_SUCCESS = 'CREATE_ARTICLE_ITEM_SUCCESS'
+const CREATE_ARTICLE_ITEM_FAILURE = 'CREATE_ARTICLE_ITEM_FAILURE'
+
+export const createArticleItemRequest = () => ({
+  type: CREATE_ARTICLE_ITEM_REQUEST
+})
+
+export const createArticleItemFailure = err => ({
+  type: CREATE_ARTICLE_ITEM_FAILURE,
+  payload: err
+})
+
+export const createArticleItemSuccess = data => ({
+  type: CREATE_ARTICLE_ITEM_SUCCESS,
+  payload: data
+})
+
+export const createArticleItem = (params = defaultArticleModel) => (dispatch, getState) => {
+  if (isProcessCarryOut(getState())) {
+    return
+  }
+  dispatch(createArticleItemRequest())
+  return Service.article.create(params).then(({ code, data }) => {
+    if (!code) {
+      dispatch(createArticleItemSuccess(data))
+    }
+  }).catch(err => dispatch(createArticleItemFailure(err)))
+}
+
+
+// ------------------------------------
 // Article Item 查看
 // ------------------------------------
 const VIEW_ARTICLE_ITEM = 'VIEW_ARTICLE_ITEM'
 
-export const viewArticleItem = currentId => ({
+export const viewArticleItem = currentArticleId => ({
   type: VIEW_ARTICLE_ITEM,
-  payload: currentId
+  payload: currentArticleId
 })
 
 // ------------------------------------
@@ -97,6 +148,7 @@ export const editArticleItem = (params = {}, id, status) => (dispatch, getState)
   if (isProcessCarryOut(getState())) {
     return
   }
+  dispatch(editArticleRequest())
   if (isType(id, 'array')) {
     return Service.article.batchUpdate({
       article_ids: id,
@@ -191,10 +243,26 @@ const ACTION_HANDLERS = {
     refreshing: false,
     fetching: false
   }),
-  [VIEW_ARTICLE_ITEM]: (state, currentId) => ({
+  [VIEW_ARTICLE_ITEM]: (state, currentArticleId) => ({
     ...state,
-    currentId
+    currentArticleId
   }),
+  [CREATE_ARTICLE_ITEM_REQUEST]: state => ({
+    ...state,
+    creating: true
+  }),
+  [CREATE_ARTICLE_ITEM_FAILURE]: state => ({
+    ...state,
+    creating: false
+  }),
+  [CREATE_ARTICLE_ITEM_SUCCESS]: (state, data) => {
+    console.log(data)
+    return {
+      ...state,
+      list: [data, ...state.list],
+      creating: false
+    }
+  },
   [EDIT_ARTICLE_ITEM_REQUEST]: state => ({
     ...state,
     saving: true
@@ -246,13 +314,14 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
-  fetching: false,    // 列表获取状态
-  saving: false,      // 列表保存状态
-  deleting: false,    // 列表删除状态
-  refreshing: false,  // 列表刷新状态
-  list: [],           // 列表LIST
-  pagination: {},     // 列表分页信息
-  currentId: ''       // 当前正在查看/编辑的文章ID
+  fetching: false,            // 列表获取状态
+  creating: false,            // 文章新建状态
+  saving: false,              // 列表保存状态
+  deleting: false,            // 列表删除状态
+  refreshing: false,          // 列表刷新状态
+  list: [],                   // 列表LIST
+  pagination: {},             // 列表分页信息
+  currentArticleId: ''        // 当前正在查看/编辑的文章ID
 }
 export default function articleListReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

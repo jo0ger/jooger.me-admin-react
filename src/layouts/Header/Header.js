@@ -24,7 +24,7 @@ export const Header = () => {
             ))
           }
         </nav>
-        <div className={styles.actions}></div>
+        <div className={styles.actions} />
       </div>
     </div>
   )
