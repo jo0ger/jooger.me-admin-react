@@ -1,0 +1,20 @@
+@import '../../styles/vars/index'
+
+.loading {
+  width: 10px;
+  height: 10px;
+  margin: 0 auto;
+  padding: 10px;
+  border: 5px dashed $blue-6;
+  border-radius: 100%;
+  animation: loading 1.5s .3s cubic-bezier(.17,.37,.43,.67) infinite;
+}
+
+@keyframes loading {
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+}

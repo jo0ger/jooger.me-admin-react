@@ -1,0 +1,30 @@
+@import '../../styles/vars/index'
+@import '../../styles/mixins/index'
+
+.list_filter {
+  position: relative;
+  height: 60px;
+  padding: $btn-padding-base;
+  border-bottom: 1px solid rgba($black, .06);
+
+  .input_search {
+    alignCenter()
+    width: 230px;
+  }
+
+  .sorter_group {
+    alignCenter()
+    right: 15px;
+    cursor: pointer;
+  }
+
+  :global {
+    .sorter_btn {
+      color: inherit;
+      i {
+        font-size: 16px !important;
+      }
+    }
+  }
+
+}

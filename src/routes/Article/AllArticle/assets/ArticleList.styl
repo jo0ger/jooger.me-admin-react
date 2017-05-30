@@ -1,0 +1,57 @@
+@import '../../../../styles/vars/index'
+@import '../../../../styles/mixins/index'
+
+.article_list {
+
+  .article_item {
+    border-left: 5px solid;
+    &:hover {
+      .tool {
+        display: block;
+      }
+    }
+
+    &.published {
+      border-left-color: $green-6;
+    }
+
+    &.drafted {
+      border-left-color: $blue-6;
+    }
+
+    &.deleted {
+      border-left-color: $red-6;
+    }
+
+  }
+
+  .hd {
+    flex(, flex-start)
+  }
+
+  .title {
+    flex-grow: 1;
+    textOverflow()
+    display: inline-block;
+  }
+
+  .tool {
+    display: none;
+    margin-left: 10px;
+  }
+
+  .bd {
+    flex()
+    margin-top: 16px;
+  }
+
+  .create_time, .update_time {
+    color: $text-color-secondary;
+    flex-basis: 50%;
+    
+    .text {
+      margin-left: 10px;
+    }
+  }
+
+}

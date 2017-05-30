@@ -1,0 +1,70 @@
+@import '../../../../styles/vars/index'
+@import '../../../../styles/mixins/index'
+
+.page_all_article {
+
+  .list_view {
+    display: block;
+  }
+
+  .detail_view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .list_content {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    bottom: 30px;
+    left: 0;
+
+    &.refreshing {
+      overflow: hidden;
+    }
+
+  }
+
+  .list_info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 20px;
+    border-top: 1px solid rgba($black, .06);
+    text-align: right;
+    letter-spacing: 1px;
+  }
+
+  .loadmore_loading {
+    margin: 16px auto;
+  }
+
+  .refresh_loading {
+    flex()
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    .refresh_overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(255,255,255,.5);
+    }
+  }
+
+  .no_data {
+    flex()
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+  }
+
+}
