@@ -37,3 +37,16 @@ state = {
 ```
 
 具体问题可以看[stackoverflow: React - changing an uncontrolled input](https://stackoverflow.com/questions/37427508/react-changing-an-uncontrolled-input)
+
+
+## TODOS
+
+* 后台即可回复评论
+* react markdown editor实现
+* 首页控制面板的可视化
+* 评论/回复的通知
+* 管理员信息修改
+* 权限管理？ （这个应该暂时不会加，没有涉及多用户，可扩展）
+* 音乐管理
+* 照片墙管理（主要是存放一些家人和自己认为好看的照片）
+* github项目管理
