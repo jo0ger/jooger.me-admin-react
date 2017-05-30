@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { withRouter, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Icon } from 'antd'
 import Transition from '~components/Transition'
@@ -13,23 +13,23 @@ const getChildRoutes = key => {
 
 const getParentPathname = pathname => pathname.split('/')[1]
 
-const createBtn = {
-  '/article/all': { text: '新建文章' },
-  '/article/category': { text: '新建分类' },
-  '/article/tag': { text: '新建标签' }
-}
+const createBtns = [
+  { path: '/article/all', text: '新建文章' },
+  { path: '/article/category', text: '新建分类' },
+  { path: '/article/tag', text: '新建标签' }
+]
 
 export class Sider extends Component {
 
   siderHdRender (pathname) {
-    const path = createBtn[pathname]
+    const createBtn = createBtns.find(item => item.path.includes(pathname))
     return (
-      path
+      createBtn
         ? (
           <div className={styles.hd}>
             <div className={styles.create_btn} onClick={this.handleClick(pathname)}>
               <Icon type="plus" />
-              <span>{path.text}</span>
+              <span>{createBtn.text}</span>
             </div>
           </div>
         )
@@ -88,4 +88,4 @@ Sider.propTypes = {
   createArticleItem: PropTypes.func.isRequired
 }
 
-export default withRouter(Sider)
+export default Sider

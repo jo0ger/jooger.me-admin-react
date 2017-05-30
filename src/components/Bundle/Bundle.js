@@ -29,12 +29,11 @@ export class Bundle extends Component {
     this.setState({ mod: null })
     this.props.preload && this.props.preload()
     props.load(mod => {
+      // handle both es imports and commonjs
       mod = mod.default ? mod.default : mod
-      this.setState({
-        // handle both es imports and commonjs
-        mod
+      this.setState({ mod }, () => {
+        this.props.callback && this.props.callback(mod)
       })
-      this.props.callback && this.props.callback(mod)
     })
   }
 

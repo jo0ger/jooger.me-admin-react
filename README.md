@@ -38,6 +38,7 @@ state = {
 
 具体问题可以看[stackoverflow: React - changing an uncontrolled input](https://stackoverflow.com/questions/37427508/react-changing-an-uncontrolled-input)
 
+2. key真的不能随便用呀，可能会导致不必要的更新，如果没设置的话也可能会导致无法更新
 
 ## TODOS
 

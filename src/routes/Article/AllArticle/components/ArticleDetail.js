@@ -198,7 +198,7 @@ export class ArticleDetail extends Component {
                         </CheckableTag>
                       ))
                     : articleModel.category ? (
-                      <Link to={`/category/${articleModel.category.name}`}>
+                      <Link to={`/article/category/${articleModel.category.name}`}>
                         <Tag>{articleModel.category.name}</Tag>
                       </Link>
                     ) : '暂无分类'

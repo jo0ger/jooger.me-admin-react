@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { Tag, Icon } from 'antd'
 import ListItem from '~components/ListItem'
 import DropOption from '~components/DropOption'
@@ -46,12 +47,14 @@ export class ArticleList extends Component {
               <div className={styles.hd}>
                 {
                   item.category
-                    ? <Tag
-                        className={styles.category}
-                        color={findCategoryExtendsItemValue(item.category.extends, 'color')}
-                      >
-                        {item.category.name}
-                      </Tag>
+                    ? <Link to={`/article/category/${item.category.name}`}>
+                        <Tag
+                          className={styles.category}
+                          color={findCategoryExtendsItemValue(item.category.extends, 'color')}
+                        >
+                          {item.category.name}
+                        </Tag>
+                      </Link>
                     : null
                 }
                 <div className={styles.title}>

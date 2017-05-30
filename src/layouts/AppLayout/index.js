@@ -1,3 +1,3 @@
-import AppLayout from './AppLayout'
+import AppLayout from './AppLayoutContainer'
 
 export default AppLayout
