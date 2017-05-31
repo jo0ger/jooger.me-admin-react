@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Row, Col, Button, Form, Input, Popover, Tag, Radio } from 'antd'
+import { Button, Form, Input, Popover, Tag, Icon, Radio, Upload, Modal } from 'antd'
 import NoData from '~components/NoData'
+import Thumb from './Thumb'
 import styles from '../assets/ArticleDetail'
-import { fmtDate, classnames } from '~utils'
+import { fmtDate, classnames, qiniuRequest } from '~utils'
 
 const FormItem = Form.Item
 const CheckableTag = Tag.CheckableTag
@@ -33,13 +34,28 @@ const defaultFormItemLayout = {
   wrapperCol: { span: 22 }
 }
 
+const getArticleStatus = state => {
+  switch (state) {
+    case -1:
+      return { color: '#f04134', text: '存于回收站' }
+    case 0:
+      return { color: '#108ee9', text: '存于草稿箱' }
+    case 1:
+      return { color: '#00a854', text: '已发布' }
+    default:
+      return {}
+  }
+}
+
 export class ArticleDetail extends Component {
 
   state = {
     articleModel: defaultArticleModel,
     editMode: false,
     keywordInputVisible: false,
-    keywordInputValue: ''
+    keywordInputValue: '',
+    thumbPreviewVisible: false,
+    thumbPreviewImage: ''
   }
 
   
@@ -145,6 +161,24 @@ export class ArticleDetail extends Component {
     this.setArticleModelByKey('tag', _t)
   }
 
+  handleThumbChange = ({ file, fileList, event }) => {
+    this.setArticleModelByKey('thumbs', fileList.map(({ uid, name, size, url, response }) => (
+      {
+        uid,
+        name,
+        size,
+        url: response ? response.url : url
+      }
+    )))
+  }
+
+  handleThumbPreview = file => this.setState({
+    thumbPreviewImage: file.url || file.thumbUrl,
+    thumbPreviewVisible: true
+  })
+
+  handleThumbPreviewCancel = () => this.setState({ thumbPreviewVisible: false })
+
   metaRender () {
     const metas = [
       { key: '创建时间', value: 'create_at' },
@@ -173,95 +207,133 @@ export class ArticleDetail extends Component {
   }
 
   formRender () {
-    const { articleModel, editMode, keywordInputVisible, keywordInputValue } = this.state
+    const { articleModel, editMode, keywordInputVisible, keywordInputValue, thumbPreviewVisible, thumbPreviewImage } = this.state
     const { categoryList, tagList } = this.props
+    const statusModel = getArticleStatus(articleModel.state)
     return (
       <Form>
-        <Row gutter={40}>
-          <Col span={24}>
-            <FormItem label="状态" {...defaultFormItemLayout}>
-              <RadioGroup onChange={this.handleStateChange} value={articleModel.state}>
-                <RadioButton className={classnames([styles.publish_state, articleModel.state === 1 ? styles.state_checked : ''])} value={1}>直接发布</RadioButton>
-                <RadioButton className={classnames([styles.draft_state, articleModel.state === 0 ? styles.state_checked : ''])} value={0}>草稿箱</RadioButton>
-                <RadioButton className={classnames([styles.delete_state, articleModel.state === -1 ? styles.state_checked : ''])} value={-1}>回收站</RadioButton>
-              </RadioGroup>
-            </FormItem>
-          </Col>
-          <Col span={24}>
-            <FormItem label="分类" {...defaultFormItemLayout}>
-              <div className={styles.category_wrap}>
-                {
-                  editMode
-                    ? categoryList.map(item => (
-                        <CheckableTag key={item._id} checked={item._id === (articleModel.category ? articleModel.category._id : null)} onChange={this.handleCategoryChange(item._id)}>
-                          {item.name}
-                        </CheckableTag>
-                      ))
-                    : articleModel.category ? (
-                      <Link to={`/article/category/${articleModel.category.name}`}>
-                        <Tag>{articleModel.category.name}</Tag>
-                      </Link>
-                    ) : '暂无分类'
-                }
-              </div>
-            </FormItem>
-          </Col>
-          <Col span={24}>
-            <FormItem label="标签" {...defaultFormItemLayout}>
-              <div className={styles.tag_wrap}>
-                {
-                  editMode
-                    ? tagList.map(item => (
-                        <CheckableTag key={item._id} checked={articleModel.tag.find(t => t._id === item._id)} onChange={this.handleTagChange(item._id)}>
-                          {item.name}
-                        </CheckableTag>
-                      ))
-                    : articleModel.tag.length ? articleModel.tag.map(item => (
-                      <Link to={`/tag/${item.name}`} key={item._id}>
-                        <Tag>{item.name}</Tag>
-                      </Link>
-                    )) : '暂无标签'
-                }
-              </div>
-            </FormItem>
-          </Col>
-          <Col span={24}>
-            <FormItem label="关键词：" {...defaultFormItemLayout}>
-              {
-                articleModel.keywords.length
-                  ? articleModel.keywords.map(item => (
-                      <Tag closable={editMode} key={item} onClose={this.handleKeywordClose(item)}>{item}</Tag>
-                    ))
-                  : editMode ? null : '暂无关键词'
-              }
-              {
-                editMode ? (
-                  keywordInputVisible
-                    ? <Input
-                        ref={this.setKeywordInput}
-                        type="text"
-                        size="small"
-                        style={{ width: 78 }}
-                        value={keywordInputValue}
-                        onChange={this.handleKeywordInputChange}
-                        onBlur={this.handleKeywordInputConfirm}
-                        onPressEnter={this.handleKeywordInputConfirm}
-                      />
-                    : <Button size="small" type="dashed" onClick={this.handleShowKeywordInput}>+ 新关键词</Button>
-                ) : null
-              }
-            </FormItem>
-          </Col>
-          <Col span={24}>
-            <FormItem label="摘要：" {...defaultFormItemLayout}>
-              {
-                editMode
-                  ? <Input type="textarea" placeholder="请写下摘要" autosize={{ minRows: 3, maxRows: 6 }} style={{resize: 'none'}} value={articleModel.excerpt} onChange={this.handleExcerptInputChange} />
-                  : articleModel.excerpt ? <p>{articleModel.excerpt}</p> : '暂无摘要'
-              }
-            </FormItem>
-          </Col>
-        </Row>
+        <FormItem label="状态" {...defaultFormItemLayout}>
+          {
+            editMode
+              ? (
+                <RadioGroup onChange={this.handleStateChange} value={articleModel.state}>
+                  <RadioButton className={classnames([styles.publish_state, articleModel.state === 1 ? styles.state_checked : ''])} value={1}>直接发布</RadioButton>
+                  <RadioButton className={classnames([styles.draft_state, articleModel.state === 0 ? styles.state_checked : ''])} value={0}>草稿箱</RadioButton>
+                  <RadioButton className={classnames([styles.delete_state, articleModel.state === -1 ? styles.state_checked : ''])} value={-1}>回收站</RadioButton>
+                </RadioGroup>
+                )
+              : <Tag color={statusModel.color}>{statusModel.text}</Tag>
+          }
+        </FormItem>
+        <FormItem label="分类" {...defaultFormItemLayout}>
+          <div className={styles.category_wrap}>
+            {
+              editMode
+                ? categoryList.map(item => (
+                    <CheckableTag key={item._id} checked={item._id === (articleModel.category ? articleModel.category._id : null)} onChange={this.handleCategoryChange(item._id)}>
+                      {item.name}
+                    </CheckableTag>
+                  ))
+                : articleModel.category ? (
+                  <Link to={`/article/category/${articleModel.category.name}`}>
+                    <Tag>{articleModel.category.name}</Tag>
+                  </Link>
+                ) : '暂无分类'
+            }
+          </div>
+        </FormItem>
+        <FormItem label="标签" {...defaultFormItemLayout}>
+          <div className={styles.tag_wrap}>
+            {
+              editMode
+                ? tagList.map(item => (
+                    <CheckableTag key={item._id} checked={articleModel.tag.find(t => t._id === item._id)} onChange={this.handleTagChange(item._id)}>
+                      {item.name}
+                    </CheckableTag>
+                  ))
+                : articleModel.tag.length ? articleModel.tag.map(item => (
+                  <Link to={`/tag/${item.name}`} key={item._id}>
+                    <Tag>{item.name}</Tag>
+                  </Link>
+                )) : '暂无标签'
+            }
+          </div>
+        </FormItem>
+        <FormItem label="关键词：" {...defaultFormItemLayout}>
+          {
+            articleModel.keywords.length
+              ? articleModel.keywords.map(item => (
+                  <Tag closable={editMode} key={item} onClose={this.handleKeywordClose(item)}>{item}</Tag>
+                ))
+              : editMode ? null : '暂无关键词'
+          }
+          {
+            editMode ? (
+              keywordInputVisible
+                ? <Input
+                    ref={this.setKeywordInput}
+                    type="text"
+                    size="small"
+                    style={{ width: 78 }}
+                    value={keywordInputValue}
+                    onChange={this.handleKeywordInputChange}
+                    onBlur={this.handleKeywordInputConfirm}
+                    onPressEnter={this.handleKeywordInputConfirm}
+                  />
+                : <Button size="small" type="dashed" onClick={this.handleShowKeywordInput}>+ 新关键词</Button>
+            ) : null
+          }
+        </FormItem>
+        <FormItem label="摘要：" {...defaultFormItemLayout}>
+          {
+            editMode
+              ? <Input type="textarea" placeholder="请写下摘要" autosize={{ minRows: 3, maxRows: 6 }} style={{resize: 'none'}} value={articleModel.excerpt} onChange={this.handleExcerptInputChange} />
+              : articleModel.excerpt ? <p>{articleModel.excerpt}</p> : '暂无摘要'
+          }
+        </FormItem>
+        <FormItem label="缩略图" {...defaultFormItemLayout}>
+          {
+            !editMode
+              ? (
+                  articleModel.thumbs.length > 0
+                    ? (
+                        <div className="ant-upload-list ant-upload-list-picture-card">
+                          {articleModel.thumbs.map(thumb => <Thumb key={thumb.url} thumb={thumb} onPreview={this.handleThumbPreview} />)}
+                        </div>
+                      )
+                    : '暂无缩略图'
+                )
+              : (
+                  <Upload
+                    customRequest={
+                      qiniuRequest({
+                          name: 'jooger',
+                          domain: 'http://oqtnezwt7.bkt.clouddn.com',
+                          uploadUrl: 'http://up-z1.qiniu.com/',
+                          uptoken: 'yvmsQiG7qdCesWCii3nMEMHK-8Ifi7EyRlcY1FmK:5a_BccSH6kZ8DluLddkjb1k-b_Y=:eyJzY29wZSI6Impvb2dlciIsImRlYWRsaW5lIjoxNDk2MjQ2Mjg2fQ==',
+                      })
+                    }
+                    listType="picture-card"
+                    fileList={articleModel.thumbs}
+                    onPreview={this.handleThumbPreview}
+                    onChange={this.handleThumbChange}
+                  >
+                    {
+                      articleModel.thumbs.length >= 3 
+                      ? null
+                      : <div>
+                          <Icon type="plus" />
+                          <div className="ant-upload-text">上传</div>
+                        </div>
+                    }
+                  </Upload>
+                )
+          }
+          
+          <Modal visible={thumbPreviewVisible} footer={null} onCancel={this.handleThumbPreviewCancel}>
+            <img alt="example" style={{ width: '100%' }} src={thumbPreviewImage} />
+          </Modal>
+        </FormItem>
       </Form>
     )
   }

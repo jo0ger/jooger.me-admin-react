@@ -1,5 +1,6 @@
 import classnames from 'classnames'
 import marked from './marked'
+import qiniuRequest from './qiniuUpload'
 
 export const debounce = (fn, delta = 0, immediate = false) => {
   let can = true
@@ -85,5 +86,6 @@ export const buildClassName = (className = '') => {
 
 export {
   classnames,
-  marked
+  marked,
+  qiniuRequest
 }

@@ -115,7 +115,7 @@ export const createArticleItem = (params = defaultArticleModel) => (dispatch, ge
 // ------------------------------------
 const VIEW_ARTICLE_ITEM = 'VIEW_ARTICLE_ITEM'
 
-export const viewArticleItem = currentArticleId => ({
+export const viewArticleItem = (currentArticleId = '') => ({
   type: VIEW_ARTICLE_ITEM,
   payload: currentArticleId
 })

@@ -43,6 +43,7 @@ export class AllArticle extends Component {
   getCurrentArticle = () => this.props.articleList.find(item => item._id === this.props.currentArticleId) || {}
 
   handleSorterMenuClick = (item) => {
+    const { viewArticleItem, fetchArticleList } = this.props
     let sort = {}
     let selectedKeys = []
     switch (item.key) {
@@ -70,7 +71,8 @@ export class AllArticle extends Component {
       selectedSorterKeys: selectedKeys
     }, () => {
       const { searchText, sorter } = this.state
-      this.props.fetchArticleList({
+      viewArticleItem('')
+      fetchArticleList({
         sort: sorter,
         keyword: searchText,
         page: 1
@@ -122,7 +124,10 @@ export class AllArticle extends Component {
     if (pagination.current_page >= pagination.total_page) {
       return
     }
+    const { searchText, sorter } = this.state
     fetchArticleList({
+      sort: sorter,
+      keyword: searchText,
       page: pagination.current_page + 1
     })
   }
