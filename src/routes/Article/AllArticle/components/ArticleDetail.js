@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Button, Form, Input, Popover, Tag, Icon, Radio, Upload, Modal } from 'antd'
 import NoData from '~components/NoData'
+import MarkdownEditor from '~components/MarkdownEditor'
 import Thumb from './Thumb'
 import styles from '../assets/ArticleDetail'
 import { fmtDate, classnames, qiniuRequest } from '~utils'
@@ -19,7 +20,7 @@ const defaultArticleModel = {
   keywords: [],
   thumbs: [],
   state: 1,
-  category: '',
+  category: {},
   tag: [],
   meta: {
     visit: 0,
@@ -37,9 +38,9 @@ const defaultFormItemLayout = {
 const getArticleStatus = state => {
   switch (state) {
     case -1:
-      return { color: '#f04134', text: '存于回收站' }
+      return { color: '#f04134', text: '回收站' }
     case 0:
-      return { color: '#108ee9', text: '存于草稿箱' }
+      return { color: '#ffce3d', text: '草稿箱' }
     case 1:
       return { color: '#00a854', text: '已发布' }
     default:
@@ -64,6 +65,9 @@ export class ArticleDetail extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    if (nextProps.currentArticle._id !== this.props.currentArticle._id) {
+      this.setState({ editMode: false })
+    }
     this.setArticleModel(nextProps)
   }
 
@@ -95,11 +99,12 @@ export class ArticleDetail extends Component {
 
   handleEdit = () => this.setState({ editMode: true })
 
-  handleCancle = () => this.setState({
-    articleModel: this.props.currentArticle,
-    editMode: false,
-  })
-
+  handleCancle = () => {
+    this.setArticleModel()
+    this.setState({
+      editMode: false,
+    })
+  }
   handleSave = () => {
     const { editArticleItem, currentArticle } = this.props
     const articleModel = { ...this.state.articleModel }
@@ -234,7 +239,7 @@ export class ArticleDetail extends Component {
                       {item.name}
                     </CheckableTag>
                   ))
-                : articleModel.category ? (
+                : articleModel.category._id ? (
                   <Link to={`/article/category/${articleModel.category.name}`}>
                     <Tag>{articleModel.category.name}</Tag>
                   </Link>
@@ -310,7 +315,7 @@ export class ArticleDetail extends Component {
                           name: 'jooger',
                           domain: 'http://oqtnezwt7.bkt.clouddn.com',
                           uploadUrl: 'http://up-z1.qiniu.com/',
-                          uptoken: 'yvmsQiG7qdCesWCii3nMEMHK-8Ifi7EyRlcY1FmK:5a_BccSH6kZ8DluLddkjb1k-b_Y=:eyJzY29wZSI6Impvb2dlciIsImRlYWRsaW5lIjoxNDk2MjQ2Mjg2fQ==',
+                          uptoken: 'yvmsQiG7qdCesWCii3nMEMHK-8Ifi7EyRlcY1FmK:32NE450cE3nukeu9wA9Hw2taabQ=:eyJzY29wZSI6Impvb2dlciIsImRlYWRsaW5lIjoxNDk2NzcwMjg0fQ==',
                       })
                     }
                     listType="picture-card"
@@ -340,7 +345,7 @@ export class ArticleDetail extends Component {
   
   render () {
     const { articleModel, editMode } = this.state
-    const { saving } = this.props
+    const { currentArticle, saving } = this.props
 
     return (
       <div className={styles.article_detail}>
@@ -374,7 +379,7 @@ export class ArticleDetail extends Component {
                     }
                   </div>
                   <div className={styles.meta}>
-                    <Popover content={this.metaRender()} placement="bottomLeft" trigger="click">
+                    <Popover content={this.metaRender()} placement="bottomLeft">
                       <Button className={styles.meta_btn} type="dashed" shape="circle" icon="info-circle-o" title="文章其他信息" />
                     </Popover>
                   </div>
@@ -386,7 +391,21 @@ export class ArticleDetail extends Component {
                   <div className={styles.info}>
                     {this.formRender()}
                   </div>
-                  <div className={styles.content} />
+                  <div
+                    className={classnames({
+                      [styles.content]: true,
+                      [styles.edit_mode]: editMode
+                    })}
+                  >
+                    {
+                      editMode
+                        ? <MarkdownEditor />
+                        : <div
+                            className={classnames([styles.article_content, 'markdown_body'])}
+                            dangerouslySetInnerHTML={{__html: currentArticle.rendered_content}}
+                          />
+                    }
+                  </div>
                 </div>
               </div>
             )

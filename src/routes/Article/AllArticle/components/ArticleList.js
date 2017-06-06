@@ -18,7 +18,7 @@ const allToolMenus = [
   { key: 'delete', name: '回收站', icon: 'delete', status: -1 }
 ]
 
-const getcurrentToolMenus = (status) => allToolMenus.filter(item => item.status !== status || item.status === 'always')
+const getcurrentToolMenus = status => allToolMenus.filter(item => item.status !== status || item.status === 'always')
 
 export class ArticleList extends Component {
 

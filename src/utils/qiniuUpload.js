@@ -12,7 +12,6 @@ const fetch = function fetch(url, options = {}, onProgress) {
 			catch (err) { reject(err) }
 		}
 		xhr.onerror = reject
-    console.log(xhr.upload, onProgress)
 		if (xhr.upload && onProgress) {
 			xhr.upload.onprogress = onProgress
 		}
@@ -77,15 +76,9 @@ export default function qiniuRequest (config) {
 		var onSuccess = ref.onSuccess
 		var filename = ref.file.name
 		var file = ref.file
-    console.log(ref)
 		qnUpload.uploadFile(file, {
 			key: filename,
-			onProgress: e => {
-        console.log(e)
-				handleProgress({
-					percent: e.loaded / e.total
-				})
-			}
+			onProgress: e => handleProgress({ percent: e.loaded / e.total })
 		}).then(onSuccess).catch(onError)
   }
 }

@@ -321,7 +321,7 @@ const initialState = {
   refreshing: false,          // 列表刷新状态
   list: [],                   // 列表LIST
   pagination: {},             // 列表分页信息
-  currentArticleId: ''        // 当前正在查看/编辑的文章ID
+  currentArticleId: '5936cee20d90c330d88aff6b'        // 当前正在查看/编辑的文章ID
 }
 export default function articleListReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]

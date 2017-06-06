@@ -6,19 +6,21 @@
     position: relative;
     width: 100%;
     min-width: 1000px;
-    height: 50px;
+    height: $header-height;
+    padding: 0 $base-padding;
     z-index: $zindex-base;
     background-color: $blue-6;
 
     .logo {
-      flex()
+      flexLayout()
       float: left;
-      width: 240px;
+      width: $sider-width;
       height: 100%;
+      margin-left: (0 - $base-padding);
 
       .logo_wrap {
-        width: 180px;
-        height: 40px;
+        width: 150px;
+        height: 30px;
         background: alpha($white, .15);
         border-radius: 6px;
       }
@@ -26,12 +28,13 @@
     }
 
     .nav {
-      margin-left: 240px;
+      display: inline-block;
+
       .nav_item {
         display: inline-block;
         width: 76px;
-        height: 50px;
-        line-height: 50px;
+        height: $header-height;
+        line-height: $header-height;
         padding: $btn-padding-sm;
         color: $text-color-secondary-dark;
         text-align: center;
@@ -41,7 +44,39 @@
       }
     }
 
-    .actions {
+    .aside {
+      float: right;
+
+      &_item {
+        height: $header-height;
+        line-height: $header-height;
+        text-align: center;
+
+        &.user_action {
+          font-size: $font-size-lger;
+          transition: $transition-ease-out;
+
+          &:hover {
+            opacity: .8;
+          }
+
+          .user_avatar {
+            width: 38px;
+            height: 38px;
+            margin-right: 10px;
+            border-radius: 5px;
+            vertical-align: middle;
+            -wekbit-user-drag: none;
+          }
+          
+        }
+
+      }
+      
+      .user_icon {
+        line-height: $header-height;
+        color: $white;
+      }
 
     }
     

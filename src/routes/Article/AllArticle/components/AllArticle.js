@@ -146,6 +146,7 @@ export class AllArticle extends Component {
           <InfiniteScroll
             customClassName={[styles.list_content, refreshing ? styles.refreshing : '']}
             onLoadmore={this.handleLoadmore}
+            loading={fetching}
           >
             {
               articleList.length

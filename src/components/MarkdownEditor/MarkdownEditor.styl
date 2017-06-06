@@ -1,0 +1,99 @@
+@import '../../styles/vars/index'
+@import '../../styles/mixins/index'
+
+.markdown_editor {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  background-color: $white;
+
+  .hd {
+    border-bottom: 1px solid rgba($black, .06);
+    box-shadow: 0 1px 6px rgba($black, .05);
+
+    .command_item {
+      display: inline-block;
+      width: 35px;
+      height: 35px;
+      line-height: 25px;
+      padding: 5px;
+      text-align: center;
+      cursor: pointer;
+      transition: $transition-ease-out;
+
+      &:hover {
+        color: $blue-6;
+        background-color: alpha($blue-6, .1);
+      }
+
+      i {
+        font-size: $font-size-lg;
+      }
+
+    }
+    
+  }
+
+  .bd {
+    full()
+    top: 35px;
+  }
+
+  .left, .right {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    overflow: auto;
+    transition: $transition-ease-out;
+  }
+
+  .right {
+    width: 0;
+    background: alpha($blue-6, .01);
+  }
+
+  &.fullscreen_mode {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $zindex-modal;
+  }
+
+  &.preview_mode {
+    .command_item_preview {
+      color: $blue-6;
+      background-color: alpha($blue-6, .1);
+    }
+    .left {
+      width: 0;
+      padding: 0;
+    }
+
+    .right {
+      width: 100%;
+    }
+  }
+
+  &.compare_mode {
+    .command_item_compare {
+      color: $blue-6;
+      background-color: alpha($blue-6, .1);
+    }
+
+    .left, .right {
+      display: inline-block;
+      width: 50%;
+    }
+
+    .left {
+      border-right: 1px solid rgba($black, .06);
+    }
+
+    .right {
+    }
+  }
+
+}

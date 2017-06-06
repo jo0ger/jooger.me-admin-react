@@ -4,7 +4,7 @@
 .article_detail {
 
   .hd {
-    flex(, flex-start)
+    flexLayout(, flex-start)
     position: relative;
     height: 60px;
     padding: $btn-padding-base;
@@ -61,9 +61,14 @@
   .bd {
     full()
     top: 60px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .info, .content, .article_content {
+      padding: 16px;
+    }
 
     .info {
-      padding: 16px;
       border-bottom: 1px solid rgba($black, .06);
     }
 
@@ -94,12 +99,31 @@
       overflow-x: hidden;
       overflow-y: auto;
     }
+
+    .content {
+      flexLayout(,, flex-start)
+      background-color: #2d2d2d;
+
+      &.edit_mode {
+        display: block;
+        padding: 0;
+        background-color: $white;
+      }
+
+    }
+
+    .article_content {
+      width: 75%;
+      min-width: 480px;
+      background-color: $white;
+      border-radius: 3px;
+    }
   }
 
 }
 
 .meta_info {
-  flex(column, ,flex-start)
+  flexLayout(column, ,flex-start)
   width: 180px;
 
   .key, .value {

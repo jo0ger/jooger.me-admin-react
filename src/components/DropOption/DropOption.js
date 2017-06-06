@@ -8,7 +8,8 @@ const MenuDevider = Menu.Divider
 
 const DropOption = ({
   menuIcon = '',
-  menuText = null,
+  menuElement = null,
+  menuCustomElement = null,
   menuStyle = {},
   theme = 'dark',
   onMenuClick = noop,
@@ -16,7 +17,9 @@ const DropOption = ({
   selectedKeys = [],
   buttonStyle = {},
   buttonClass = '',
-  dropdownProps = {}
+  dropdownProps = {},
+  placement = "bottomCenter",
+  showArrow = true
 }) => {
   const menu = menuOptions.map(item => (
     item.key === 'divider'
@@ -32,24 +35,31 @@ const DropOption = ({
 
   return (
     <Dropdown
-      placement="bottomCenter"
+      placement={placement}
       overlay={<Menu theme={theme} selectedKeys={selectedKeys} onClick={onMenuClick}>{menu}</Menu>}
       {...dropdownProps}
     >
     <a className={classnames(className)} style={{ border: 'none', ...buttonStyle }}>
-      <Icon type={menuIcon} />
-      {menuText}
-      <Icon type="down" />
+      {
+        menuIcon && <Icon type={menuIcon} />
+      }
+      {menuElement}
+      {menuCustomElement}
+      {showArrow && <Icon type="down" />}
     </a>
   </Dropdown>)
 }
 
 DropOption.propTypes = {
   menuIcon: PropTypes.string,
-  menuText: PropTypes.string,
+  menuElement: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.string
+  ]),
   menuStyle: PropTypes.object,
   onMenuClick: PropTypes.func,
   menuOptions: PropTypes.array,
+  selectedKeys: PropTypes.array,
   buttonStyle: PropTypes.object,
   buttonClass: PropTypes.oneOfType([
     PropTypes.object,
@@ -57,6 +67,9 @@ DropOption.propTypes = {
     PropTypes.array
   ]),
   dropdownProps: PropTypes.object,
+  theme: PropTypes.string,
+  placement: PropTypes.string,
+  showArrow: PropTypes.bool
 }
 
 export default DropOption

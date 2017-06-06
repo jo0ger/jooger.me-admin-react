@@ -17,9 +17,12 @@ export class InfiniteScroll extends PureComponent {
   
 
   bindDOMEvent () {
-    const { onLoadmore } = this.props
+    const { onLoadmore, loading } = this.props
     if (onLoadmore && this._scrollContainer) {
       this._scrollHandler = e => {
+        if (loading) {
+          return
+        }
         const { target } = e
         if (target.clientHeight + target.scrollTop >= target.scrollHeight) {
           onLoadmore(e)
@@ -59,7 +62,8 @@ InfiniteScroll.propTypes = {
     PropTypes.string,
     PropTypes.array
   ]),
-  onLoadmore: PropTypes.func
+  onLoadmore: PropTypes.func,
+  loading: PropTypes.bool
 }
 
 export default InfiniteScroll
