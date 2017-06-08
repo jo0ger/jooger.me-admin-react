@@ -1,10 +1,11 @@
 @import '../../styles/vars/index'
 @import '../../styles/mixins/index'
 
+$command-item-height            = 35px
+
 .markdown_editor {
   position: relative;
   width: 100%;
-  min-height: 500px;
   background-color: $white;
 
   .hd {
@@ -13,9 +14,9 @@
 
     .command_item {
       display: inline-block;
-      width: 35px;
-      height: 35px;
-      line-height: 25px;
+      width: $command-item-height ;
+      height: $command-item-height ;
+      line-height: ($command-item-height  - 2 * 5px);
       padding: 5px;
       text-align: center;
       cursor: pointer;
@@ -37,19 +38,32 @@
   .bd {
     full()
     top: 35px;
+    min-height: "calc(100vh - %s - 60px - %s)" % ($header-height $command-item-height);
   }
 
-  .left, .right {
+  .edit_pane, .preview_pane {
     display: inline-block;
     width: 100%;
     height: 100%;
-    padding: 10px;
     overflow: auto;
     transition: $transition-ease-out;
   }
 
-  .right {
+  .edit_pane {
+    overflow: hidden;
+
+    .input_area {
+      width: 100%;
+      height: 100%;
+      padding: $base-padding;
+      border: none;
+      outline: none;
+    }
+  }
+
+  .preview_pane {
     width: 0;
+    padding: $base-padding;
     background: alpha($blue-6, .01);
   }
 
@@ -67,12 +81,12 @@
       color: $blue-6;
       background-color: alpha($blue-6, .1);
     }
-    .left {
+    .edit_pane {
       width: 0;
       padding: 0;
     }
 
-    .right {
+    .preview_pane {
       width: 100%;
     }
   }
@@ -83,16 +97,16 @@
       background-color: alpha($blue-6, .1);
     }
 
-    .left, .right {
+    .edit_pane, .preview_pane {
       display: inline-block;
       width: 50%;
     }
 
-    .left {
+    .edit_pane {
       border-right: 1px solid rgba($black, .06);
     }
 
-    .right {
+    .preview_pane {
     }
   }
 

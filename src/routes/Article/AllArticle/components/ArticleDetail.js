@@ -74,6 +74,8 @@ export class ArticleDetail extends Component {
   componentWillUnmount () {}
 
   setArticleModel (props = this.props) {
+    // ...扩展运算符是浅复制
+    // TODO 深复制
     this.setState({
       articleModel: {
         ...defaultArticleModel,
@@ -99,7 +101,7 @@ export class ArticleDetail extends Component {
 
   handleEdit = () => this.setState({ editMode: true })
 
-  handleCancle = () => {
+  handleBack = () => {
     this.setArticleModel()
     this.setState({
       editMode: false,
@@ -183,6 +185,8 @@ export class ArticleDetail extends Component {
   })
 
   handleThumbPreviewCancel = () => this.setState({ thumbPreviewVisible: false })
+
+  handleEditorValueChange = value => this.setArticleModelByKey('content', value)
 
   metaRender () {
     const metas = [
@@ -346,6 +350,10 @@ export class ArticleDetail extends Component {
   render () {
     const { articleModel, editMode } = this.state
     const { currentArticle, saving } = this.props
+    const markdownEditorValue = {
+      text: articleModel.content,
+      selection: null
+    }
 
     return (
       <div className={styles.article_detail}>
@@ -372,7 +380,7 @@ export class ArticleDetail extends Component {
                         ? (
                             <div>
                               <Button className={styles.save_btn} icon="save" type="primary" loading={saving} onClick={this.handleSave}>保存</Button>
-                              <Button className={styles.cancle_btn} onClick={this.handleCancle}>取消</Button>
+                              <Button className={styles.cancle_btn} onClick={this.handleBack}>返回</Button>
                             </div>
                           )
                         : <Button className={styles.edit_btn} icon="edit" onClick={this.handleEdit}>编辑</Button>
@@ -399,7 +407,10 @@ export class ArticleDetail extends Component {
                   >
                     {
                       editMode
-                        ? <MarkdownEditor />
+                        ? <MarkdownEditor
+                            value={markdownEditorValue}
+                            onChange={this.handleEditorValueChange}
+                          />
                         : <div
                             className={classnames([styles.article_content, 'markdown_body'])}
                             dangerouslySetInnerHTML={{__html: currentArticle.rendered_content}}

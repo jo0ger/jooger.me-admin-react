@@ -1,23 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styles from './MarkdownEditor.styl'
-import { classnames } from '~utils'
-
-const commandList = [
-  { key: 'bold', title: '加粗' },
-  { key: 'italic', title: '斜体' },
-  { key: 'underline', title: '下划线' },
-  { key: 'h1', title: 'H1' },
-  { key: 'h2', title: 'H2' },
-  { key: 'h3', title: 'H3' },
-  { key: 'code', title: '代码' },
-  { key: 'link', title: '链接' },
-  { key: 'image', title: '图片' },
-  { key: 'preview', title: '预览' },
-  { key: 'compare', title: '对照' },
-  { key: 'grow', title: '全屏' },
-  { key: 'shrink', title: '缩放' }
-]
+import { classnames, marked, debounce } from '~utils'
+import commandList from '~utils/markdownEditorHelper/commands'
+import { getSelection, setSelection } from '~utils/markdownEditorHelper/selectionHelper'
 
 export class MarkdownEditor extends Component {
 
@@ -27,12 +13,35 @@ export class MarkdownEditor extends Component {
       editContent: props.content,
       fullscreenMode: false,
       previewMode: false,
-      compareMode: true
+      compareMode: true,
+      previewContent: ''
+    }
+    this.setPreviewContent = this.getPreviewContentDebounceFn()
+  }
+  
+  componentWillMount() {
+    this.setPreviewContent(this.props.value.text)
+  }
+  
+  componentWillReceiveProps (nextProps) {
+    const { text } = nextProps.value
+    if (text !== this.props.value.text) {
+      this.setPreviewContent(text)
     }
   }
 
-  handleCommandClick = key => () => {
-    switch (key) {
+  setTextarea = node => this._textarea = node
+
+  getPreviewContentDebounceFn () {
+    return debounce((content = '') => {
+      this.setState({
+        previewContent: marked(content)
+      })
+    }, 200)
+  }
+
+  handleCommandClick = cmd => () => {
+    switch (cmd.key) {
       case 'grow':
         this.setState({ fullscreenMode: true })
         break
@@ -48,12 +57,30 @@ export class MarkdownEditor extends Component {
         this.setState({ previewMode: false })
         break
       default:
+        this.executeCommand(cmd)
         break
     }
   }
 
+  handleValueChange = e => this.props.onChange(e.target.value)
+
+  executeCommand (cmd) {
+    const { value: { text } } = this.props
+    const newValue = cmd.execute ? cmd.execute(text, getSelection(this._textarea)) : null
+    if (!newValue) {
+      return
+    }
+    console.log(newValue)
+    this._textarea.focus()
+    setSelection(this._textarea, 0, this._textarea.value.length)
+    document.execCommand('insertText', false, newValue.text)
+    setSelection(this._textarea, newValue.selection[0], newValue.selection[1])
+  }
+
   render () {
-    const { fullscreenMode, previewMode, compareMode } = this.state
+    const { fullscreenMode, previewMode, compareMode, previewContent } = this.state
+    const { value: { text } } = this.props
+
     return (
       <div className={classnames({
           [styles.markdown_editor]: true,
@@ -75,7 +102,7 @@ export class MarkdownEditor extends Component {
                     key={item.key}
                     className={classnames([styles.command_item, styles[itemClass] || itemClass])} 
                     title={item.title}
-                    onClick={this.handleCommandClick(item.key)}
+                    onClick={this.handleCommandClick(item)}
                   >
                     <i className={classnames(['iconfont', `icon-${item.key}`])} />
                   </li>
@@ -85,8 +112,15 @@ export class MarkdownEditor extends Component {
           </ul>
         </div>
         <div className={styles.bd}>
-          <div className={styles.left}></div>
-          <div className={styles.right}></div>
+          <div className={styles.edit_pane}>
+            <textarea
+              className={styles.input_area}
+              onChange={this.handleValueChange}
+              value={text}
+              ref={this.setTextarea}
+            />
+          </div>
+          <div className={classnames([styles.preview_pane, 'markdown_body'])} dangerouslySetInnerHTML={{__html: previewContent}} />
         </div>
       </div>
     )
@@ -94,7 +128,12 @@ export class MarkdownEditor extends Component {
 }
 
 MarkdownEditor.propTypes = {
-  content: PropTypes.string
+  content: PropTypes.string,
+  value: PropTypes.shape({
+    text: PropTypes.string.isRequired,
+    selection: PropTypes.arrayOf(PropTypes.number)
+  }).isRequired,
+  onChange: PropTypes.func.isRequired
 }
 
 export default MarkdownEditor

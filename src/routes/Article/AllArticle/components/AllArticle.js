@@ -157,7 +157,7 @@ export class AllArticle extends Component {
                     onItemSelected={this.handleViewArticleItem}
                     onToolClick={this.handleArticleToolClick}
                   />
-                : <NoData show={!fetching} text="NO ARTICLE DATA" iconSize={36} />
+                : <NoData show={!fetching && !refreshing} text="NO ARTICLE DATA" iconSize={36} />
             }
             <ListReFreshLoading loading={refreshing} />
             <Loading className={styles.loadmore_loading} loading={fetching} />
