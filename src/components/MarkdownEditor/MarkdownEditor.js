@@ -70,7 +70,7 @@ export class MarkdownEditor extends Component {
     if (!newValue) {
       return
     }
-    console.log(newValue)
+    
     this._textarea.focus()
     setSelection(this._textarea, 0, this._textarea.value.length)
     document.execCommand('insertText', false, newValue.text)

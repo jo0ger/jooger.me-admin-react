@@ -1,72 +1,70 @@
 // MarkdownEditor Commands
 import {
-  makeCommandByInsertAround
+  makeCommandByInsertBefore,
+  makeCommandByInsertBeforeAndAfter,
+  makeCode
 } from './commandsHelper'
 
 export default [
   { 
     key: 'bold',
     title: '加粗',
-    execute: (text, selection) => makeCommandByInsertAround(text, selection, '**')
+    execute: (text, selection) => makeCommandByInsertBeforeAndAfter(text, selection, '**', '**')
   },
   { 
     key: 'italic',
     title: '斜体',
-    execute: (text, selection) => makeCommandByInsertAround(text, selection, '_')
+    execute: (text, selection) => makeCommandByInsertBeforeAndAfter(text, selection, '_', '_')
   },
   { 
     key: 'strikethrough',
     title: '删除线',
-    execute: (text, selection) => makeCommandByInsertAround(text, selection, '~~')
+    execute: (text, selection) => makeCommandByInsertBeforeAndAfter(text, selection, '~~', '~~')
   },
   { 
     key: 'h1',
     title: 'H1',
-    execute: (text, selection) => {}
+    execute: (text, selection) => makeCommandByInsertBefore(text, selection, '# ')
   },
   { 
     key: 'h2',
     title: 'H2',
-    execute: (text, selection) => {}
+    execute: (text, selection) => makeCommandByInsertBefore(text, selection, '## ')
   },
   { 
     key: 'h3',
     title: 'H3',
-    execute: (text, selection) => {}
+    execute: (text, selection) => makeCommandByInsertBefore(text, selection, '## ')
   },
   { 
     key: 'code',
     title: '代码',
-    execute: (text, selection) => {}
+    execute: (text, selection) => makeCode(text, selection)
   },
   { 
     key: 'link',
     title: '链接',
-    execute: (text, selection) => {}
+    execute: (text, selection) => makeCommandByInsertBeforeAndAfter(text, selection, '[', '](url)')
   },
   { 
     key: 'image',
     title: '图片',
-    execute: (text, selection) => {}
+    execute: (text, selection) => makeCommandByInsertBeforeAndAfter(text, selection, '![', '](imgUrl)')
   },
   { 
     key: 'preview',
-    title: '预览',
-    execute: (text, selection) => {}
+    title: '预览'
   },
   { 
     key: 'compare',
-    title: '对照',
-    execute: (text, selection) => {}
+    title: '对照'
   },
   { 
     key: 'grow',
-    title: '全屏',
-    execute: (text, selection) => {}
+    title: '全屏'
   },
   { 
     key: 'shrink',
-    title: '缩放',
-    execute: (text, selection) => {}
+    title: '缩放'
   }
 ]

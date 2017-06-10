@@ -1,0 +1,31 @@
+@import '../../../../styles/vars/index'
+@import '../../../../styles/mixins/index'
+
+.article_comments {
+  position: relative;
+  width: 500px;
+  height: 100%;
+  overflow: hidden;
+  box-shadow: $box-shadow-base;
+  border: none;
+
+  .close_btn {
+    cursor: pointer;
+    transition: $transition-ease-out;
+
+    &:hover {
+      color: $blue-6;
+    }
+
+  }
+
+  :global {
+    .ant-card-body {
+      position: relative;
+      height: calc(100% - 48px);
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+
+}

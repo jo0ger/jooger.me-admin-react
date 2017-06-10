@@ -13,9 +13,9 @@ const findCategoryExtendsItemValue = (extendsList = [], key = '') => {
 }
 
 const allToolMenus = [
-  { key: 'publish', name: '发布', icon: 'upload', status: 1 },
-  { key: 'draft', name: '草稿箱', icon: 'copy', status: 0 },
-  { key: 'delete', name: '回收站', icon: 'delete', status: -1 }
+  { key: 'publish', name: '发布', status: 1 },
+  { key: 'draft', name: '草稿箱', status: 0 },
+  { key: 'delete', name: '回收站', status: -1 }
 ]
 
 const getcurrentToolMenus = status => allToolMenus.filter(item => item.status !== status || item.status === 'always')
@@ -25,6 +25,11 @@ export class ArticleList extends Component {
   handleItemSlected = id => this.props.onItemSelected(id)
 
   handleToolMenuClick = id => item => this.props.onToolClick(item.key, id)
+
+  handleForeverDeleteItem = id => () => {
+    console.log(id)
+    this.props.onForeverDeleteItem(id)
+  }
 
   render () {
     const { articleList, currentArticleId } = this.props
@@ -66,6 +71,7 @@ export class ArticleList extends Component {
                     buttonStyle={{ width: 20, textAlign: 'center' }}
                     onMenuClick={this.handleToolMenuClick(item._id)}
                   />
+                  <Icon type="delete" className={styles.remove_btn} title="永久删除" onClick={this.handleForeverDeleteItem(item._id)} />
                 </div>
               </div>
               <div className={styles.bd}>
@@ -91,8 +97,9 @@ ArticleList.propTypes = {
   articleList: PropTypes.array.isRequired,
   pagination: PropTypes.object.isRequired,
   currentArticleId: PropTypes.string.isRequired,
-  onItemSelected: PropTypes.func,
-  onToolClick: PropTypes.func
+  onItemSelected: PropTypes.func.isRequired,
+  onToolClick: PropTypes.func.isRequired,
+  onForeverDeleteItem: PropTypes.func.isRequired
 }
 
 export default ArticleList

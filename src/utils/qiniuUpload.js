@@ -1,4 +1,5 @@
 // 七牛云文件上传
+import Service from '~service'
 
 const fetch = function fetch(url, options = {}, onProgress) {
 	return new Promise((resolve, reject) => {
@@ -19,12 +20,9 @@ const fetch = function fetch(url, options = {}, onProgress) {
 	})
 }
 
-const validateConfig =config => {
-	const { uptoken, uploadUrl, domain, name } = config;
-	if (!name) {
-		throw new Error('bucket name is required');
-	}
-	else if (!domain) {
+const validateConfig = config => {
+	const { uptoken, uploadUrl, domain } = config;
+	if (!domain) {
 		throw new Error('domain is required');
 	}
   else if (!uploadUrl) {
@@ -47,29 +45,36 @@ const renderResponse = (config, data) => {
   }
 }
 
+/**
+ * config 
+ * 	uptoken
+ * 	uploadUrl
+ */
 export class QiniuUpload {
-  constructor (config = {}) {
-    this._config = validateConfig(config)
-  }
 
-  uploadFile (file, options = {}) {
-    const { uploadUrl, uptoken } = this._config
+  async uploadFile (file, options = {}) {
     const { key, onProgress } = options
+		const { code, data } = await Service.qiniu.getConfig().catch(err => { throw new Error(err) })
+		if (code) {
+			return
+		}
+		const config = data
+		validateConfig(config)
     const formData = new FormData()
-    formData.append('token', uptoken)
+    formData.append('token', config.uptoken)
     formData.append('file', file)
     if (key) {
       formData.append('key', key)
     }
-    return fetch(uploadUrl, {
+    return fetch(config.uploadUrl, {
       method: 'POST',
       body: formData
-    }, onProgress).then(data => renderResponse(this._config, data))
+    }, onProgress).then(data => renderResponse(config, data))
   }
 }
 
-export default function qiniuRequest (config) {
-  const qnUpload = new QiniuUpload(config)
+export default function qiniuRequest () {
+  const qnUpload = new QiniuUpload()
   return function customRequest (ref) {
     var handleProgress = ref.onProgress
 		var onError = ref.onError

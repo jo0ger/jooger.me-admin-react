@@ -1,19 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Loading from './Loading'
-import styles from './ListReFreshLoading.styl'
+import styles from './ReFreshLoading.styl'
 
-export const ListReFreshLoading = ({ loading = false }) => {
+export const ReFreshLoading = ({ loading = false }) => {
   return loading ? (
-    <div className={styles.list_refresh_loading}>
+    <div className={styles.refresh_loading}>
       <div className={styles.refresh_overlay} />
       <Loading loading={loading} />
     </div>
   ) : null
 }
 
-ListReFreshLoading.propTypes = {
+ReFreshLoading.propTypes = {
   loading: PropTypes.bool
 }
 
-export default ListReFreshLoading
+export default ReFreshLoading

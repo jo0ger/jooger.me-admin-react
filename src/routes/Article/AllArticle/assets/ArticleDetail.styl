@@ -64,7 +64,7 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-    .info, .content, .article_content {
+    .info, .content {
       padding: 16px;
     }
 
@@ -100,9 +100,23 @@
       overflow-y: auto;
     }
 
+    .extends_item_key , .extends_item_value {
+      display: inline-block;
+    }
+
+    .extends_item_key {
+      width: 50px;
+      margin-right: 10px;
+      font-weight: 700;
+    }
+
+    .edit_extends_item {
+      margin-bottom: $base-margin;
+    }
+
     .content {
       flexLayout(,, flex-start)
-      background-color: #2d2d2d;
+      background-color: $grey-2;
 
       &.edit_mode {
         display: block;
@@ -118,6 +132,12 @@
       background-color: $white;
       border-radius: 3px;
     }
+  }
+
+  .aside {
+    full()
+    top: 60px;
+    left: auto;
   }
 
 }

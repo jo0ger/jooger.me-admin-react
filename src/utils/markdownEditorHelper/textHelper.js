@@ -19,7 +19,7 @@ export const insertAfter = (text, selection, insertionText) => {
   const { newText } = insertText(text, insertionText, selection[1])
   return {
     newText,
-    newSelection: selection
+    newSelection: [selection[0], selection[1] + insertionText.length]
   }
 }
 
@@ -27,6 +27,34 @@ export const insertBeforeAndAfter = (text, selection, beforeInsertionText = '', 
   const newAfterText = insertAfter(text, selection, afterInsertionText).newText
   const { newText, newSelection } = insertBefore(newAfterText, selection, beforeInsertionText)
   return { newText, newSelection }
+}
+
+export const insertEmptyLineBefore = (text, selection) => {
+  const breaksNeededBefore = getBreaksNeededForEmptyLineBefore(text, selection[0])
+  const beforeInsertionText = Array(breaksNeededBefore + 1).join('\n')
+  if (beforeInsertionText) {
+    const { newText, newSelection } = insertBefore(text, selection, beforeInsertionText)
+    text = newText
+    selection = newSelection
+  }
+  return {
+    newText: text,
+    newSelection: selection
+  }
+}
+
+export const insertEmptyLineAfter = (text, selection) => {
+  const breaksNeededAfter = getBreaksNeededForEmptyLineAfter(text, selection[1])
+  const afterInsertionText = Array(breaksNeededAfter + 1).join('\n')
+  if (afterInsertionText) {
+    const { newText, newSelection } = insertAfter(text, selection, afterInsertionText)
+    text = newText
+    selection = newSelection
+  }
+  return {
+    newText: text,
+    newSelection: selection
+  }
 }
 
 export function getSurroundingSelection (text, selection) {
@@ -59,4 +87,47 @@ function getSurroundingWordPosition (text, position) {
   }
 
   return [start, end]
+}
+
+function getBreaksNeededForEmptyLineBefore (text, startPosition) {
+  if (startPosition === 0) {
+    return 0
+  }
+
+  let neededBreaks = 2
+  let isInFirstLine = true
+  for (let i = startPosition - 1; i >= 0 && (neededBreaks >= 0); i--) {
+    switch (text.charCodeAt(i)) {
+      case 32: continue
+      case 10: {
+        neededBreaks--
+        isInFirstLine = false
+        break
+      }
+      default:
+        return neededBreaks
+    }
+  }
+  return isInFirstLine ? 0 : neededBreaks
+}
+
+function getBreaksNeededForEmptyLineAfter (text, startPosition) {
+  if (startPosition === text.length - 1) {
+    return 0
+  }
+
+  let neededBreaks = 2
+  let isInLastLine = true
+  for (let i = startPosition; i < text.length && (neededBreaks >= 0); i++) {
+    switch (text.charCodeAt(i)) {
+      case 32: continue
+      case 10: {
+        neededBreaks--
+        isInLastLine = false
+        break
+      }
+      default: return neededBreaks
+    }
+  }
+  return isInLastLine ? 0 : neededBreaks
 }

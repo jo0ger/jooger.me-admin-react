@@ -3,6 +3,7 @@
 $fade               = fade
 $slide-left         = slide-left
 $slide-left-100     = slide-left-100
+$slide-right-100     = slide-right-100
 $create-at          = create-at
 
 :global {
@@ -103,6 +104,43 @@ $create-at          = create-at
       &.{$slide-left-100}-leave-active {
         opacity: 0;
         transform: translate3d(-100%, 0, 0);
+        transition: $transition-ease-out;
+      }
+
+    }
+  }
+
+  .{$slide-right-100} {
+
+    &-appear {
+      opacity: 0;
+      transform: translate3d(100%, 0, 0);
+
+      &.{$slide-right-100}-appear-active {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-enter {
+      opacity: 0;
+      transform: translate3d(100%, 0, 0);
+
+      &.{$slide-right-100}-enter-active {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition: $transition-ease-out;
+      }
+    }
+
+    &-leave {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+
+      &.{$slide-right-100}-leave-active {
+        opacity: 0;
+        transform: translate3d(100%, 0, 0);
         transition: $transition-ease-out;
       }
 

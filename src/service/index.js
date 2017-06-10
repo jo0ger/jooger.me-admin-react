@@ -3,7 +3,7 @@ import { message } from 'antd'
 
 const isProd = process.env.NODE_ENV === 'production'
 
-export const instance = axios.create({
+export const fetcher = axios.create({
   baseURL: !isProd ? 'http://localhost:5000/v1' : 'http://api.jooger.com/v1',
   timeout: 5000
 })
@@ -14,7 +14,7 @@ const code = {
   UNAUTHORIZED: 401
 }
 
-instance.interceptors.request.use(config => {
+fetcher.interceptors.request.use(config => {
   config.params = config.params || {}
   if (!isProd) {
     config.params._DEV_ = true
@@ -22,7 +22,7 @@ instance.interceptors.request.use(config => {
   return config
 })
 
-instance.interceptors.response.use(response => {
+fetcher.interceptors.response.use(response => {
   if (!response || !response.data) {
     // TODO 提示服务器异常
     message.error('服务器异常')
@@ -49,7 +49,7 @@ instance.interceptors.response.use(response => {
   return error.response
 })
 
-const wrap = (type, url) => (params = {}) => instance[type](url, params)
+const wrap = (type, url) => (config = {}) => fetcher.request({ ...config, method: type, url })
 
 const Service = {
   auth: {
@@ -69,6 +69,15 @@ const Service = {
     editItem: id => wrap('put', `/article/${id}`),
     changeItemState: id => wrap('patch', `/article/${id}`),
     deleteItem: id => wrap('delete', `/article/${id}`)
+  },
+  comment: {
+    getList: wrap('get', '/comment'),
+    create: wrap('post', '/comment'),
+    batchUpdate: wrap('patch', '/comment'),
+    natchDelete: wrap('delete', '/comment'),
+    getItem: id => wrap('get', `/comment/${id}`),
+    editItem: id => wrap('put', `/comment/${id}`),
+    deleteItem: id => wrap('delete', `/comment/${id}`)
   },
   category: {
     getList: wrap('get', '/category'),
@@ -90,6 +99,9 @@ const Service = {
     getInfo: wrap('get', '/option'),
     create: wrap('post', '/option'),
     editInfo: wrap('put', '/option'),
+  },
+  qiniu: {
+    getConfig: wrap('get', '/qiniu')
   }
 }
 

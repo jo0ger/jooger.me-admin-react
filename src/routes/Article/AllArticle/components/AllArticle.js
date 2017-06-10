@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { Modal } from 'antd'
 import Page from '~components/Page'
 import ListFilter from '~components/ListFilter'
 import ArticleList from './ArticleList'
 import ArticleDetail from '../containers/ArticleDetailContainer'
 import InfiniteScroll from '~components/InfiniteScroll'
 import NoData from '~components/NoData'
-import { Loading, ListReFreshLoading } from '~components/Loading'
+import { Loading, ReFreshLoading } from '~components/Loading'
 import styles from '../assets/AllArticle'
 
 const sorterMenus = [
@@ -119,6 +120,32 @@ export class AllArticle extends Component {
     this.props.editArticleItem({}, [id], state)
   }
 
+  handleDeleteArticleItem = id => {
+    Modal.confirm({
+      title: '永久删除',
+      content: (
+        <div>
+          <p>确定要删除吗？</p>
+          <p><b>永久删除的文章无法恢复</b></p>
+          <p><b>而且，将永久删除文章相关的评论</b></p>
+        </div>
+      ),
+      onOk: () => {
+        const { deleteArticleItem, fetchArticleList } = this.props
+        deleteArticleItem(id).then(success => {
+          if (success) {
+            const { searchText, sorter } = this.state
+            fetchArticleList({
+              sort: sorter,
+              keyword: searchText,
+              page: 1
+            }, true)
+          }
+        })
+      }
+    })
+  }
+
   handleLoadmore = e => {
     const { fetchArticleList, pagination } = this.props
     if (pagination.current_page >= pagination.total_page) {
@@ -156,10 +183,11 @@ export class AllArticle extends Component {
                     currentArticleId={currentArticleId}
                     onItemSelected={this.handleViewArticleItem}
                     onToolClick={this.handleArticleToolClick}
+                    onForeverDeleteItem={this.handleDeleteArticleItem}
                   />
                 : <NoData show={!fetching && !refreshing} text="NO ARTICLE DATA" iconSize={36} />
             }
-            <ListReFreshLoading loading={refreshing} />
+            <ReFreshLoading loading={refreshing} />
             <Loading className={styles.loadmore_loading} loading={fetching} />
           </InfiniteScroll>
           <div className={styles.list_info}>

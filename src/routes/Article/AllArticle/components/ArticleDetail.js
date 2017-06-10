@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Button, Form, Input, Popover, Tag, Icon, Radio, Upload, Modal } from 'antd'
+import { Button, Form, Input, Popover, Tag, Icon, Radio, Upload, Modal, Col, Badge, Card } from 'antd'
 import NoData from '~components/NoData'
 import MarkdownEditor from '~components/MarkdownEditor'
 import Thumb from './Thumb'
+import ArticleComments from './ArticleComments'
 import styles from '../assets/ArticleDetail'
 import { fmtDate, classnames, qiniuRequest } from '~utils'
 
@@ -12,6 +13,7 @@ const FormItem = Form.Item
 const CheckableTag = Tag.CheckableTag
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
+const InputGroup = Input.Group
 
 const defaultArticleModel = {
   title: '',
@@ -52,13 +54,13 @@ export class ArticleDetail extends Component {
 
   state = {
     articleModel: defaultArticleModel,
-    editMode: false,
+    editMode: true,
     keywordInputVisible: false,
     keywordInputValue: '',
     thumbPreviewVisible: false,
-    thumbPreviewImage: ''
+    thumbPreviewImage: '',
+    showComments: true
   }
-
   
   componentWillMount() {
     this.setArticleModel()
@@ -66,7 +68,7 @@ export class ArticleDetail extends Component {
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.currentArticle._id !== this.props.currentArticle._id) {
-      this.setState({ editMode: false })
+      this.setState({ editMode: true, showComments: false })
     }
     this.setArticleModel(nextProps)
   }
@@ -74,12 +76,12 @@ export class ArticleDetail extends Component {
   componentWillUnmount () {}
 
   setArticleModel (props = this.props) {
-    // ...扩展运算符是浅复制
-    // TODO 深复制
+    // 这里需要用到深拷贝，
+    // 因为...扩展运算符是浅复制
     this.setState({
       articleModel: {
         ...defaultArticleModel,
-        ...props.currentArticle
+        ...JSON.parse(JSON.stringify(props.currentArticle))
       }
     })
   }
@@ -188,6 +190,32 @@ export class ArticleDetail extends Component {
 
   handleEditorValueChange = value => this.setArticleModelByKey('content', value)
 
+  handleAddExtendsItem = () => {
+    this.setArticleModelByKey('extends', [
+      ...this.state.articleModel.extends,
+      { key: '', value: '' }
+    ])
+  }
+
+  handleExtendsItemInputChange = (index, type) => e => {
+    const articleExtends = [...this.state.articleModel.extends]
+    articleExtends.splice(index, 1, {
+      ...articleExtends[index],
+      [type]: e.target.value
+    })
+    this.setArticleModelByKey('extends', articleExtends)
+  }
+
+  handleRemoveExtendsItem = index => () => {
+    const articleExtends = [...this.state.articleModel.extends]
+    articleExtends.splice(index, 1)
+    this.setArticleModelByKey('extends', articleExtends)
+  }
+
+  handleViewComments = () => this.setState({ showComments: !this.state.showComments })
+
+  handleCloseComments = () => this.setState({ showComments: false })
+
   metaRender () {
     const metas = [
       { key: '创建时间', value: 'create_at' },
@@ -212,6 +240,32 @@ export class ArticleDetail extends Component {
           })
         }
       </div>  
+    )
+  }
+
+  extendsRender () {
+    const { articleModel } = this.state
+    return (
+      <div>
+        {
+          articleModel.extends.map((item, index) => (
+            <InputGroup className={styles.edit_extends_item} key={index}>
+              <Col span="5">
+                <Input placeholder="key" value={item.key} onChange={this.handleExtendsItemInputChange(index, 'key')} />
+              </Col>
+              <Col span="5">
+                <Input placeholder="value" value={item.value} onChange={this.handleExtendsItemInputChange(index, 'value')} />
+              </Col>
+              <Col span="2">
+                <Button type="danger" icon="delete" onClick={this.handleRemoveExtendsItem(index)} />
+              </Col>
+            </InputGroup>
+          ))
+        }
+        <Button className={styles.extends_add} type="dashed" onClick={this.handleAddExtendsItem} style={{ width: '40%' }}>
+          <Icon type="plus" /> 增加扩展
+        </Button>
+      </div>
     )
   }
 
@@ -261,7 +315,7 @@ export class ArticleDetail extends Component {
                     </CheckableTag>
                   ))
                 : articleModel.tag.length ? articleModel.tag.map(item => (
-                  <Link to={`/tag/${item.name}`} key={item._id}>
+                  <Link to={`/article/tag/${item.name}`} key={item._id}>
                     <Tag>{item.name}</Tag>
                   </Link>
                 )) : '暂无标签'
@@ -279,16 +333,18 @@ export class ArticleDetail extends Component {
           {
             editMode ? (
               keywordInputVisible
-                ? <Input
-                    ref={this.setKeywordInput}
-                    type="text"
-                    size="small"
-                    style={{ width: 78 }}
-                    value={keywordInputValue}
-                    onChange={this.handleKeywordInputChange}
-                    onBlur={this.handleKeywordInputConfirm}
-                    onPressEnter={this.handleKeywordInputConfirm}
-                  />
+                ? (
+                    <Input
+                      ref={this.setKeywordInput}
+                      type="text"
+                      size="small"
+                      style={{ width: 78 }}
+                      value={keywordInputValue}
+                      onChange={this.handleKeywordInputChange}
+                      onBlur={this.handleKeywordInputConfirm}
+                      onPressEnter={this.handleKeywordInputConfirm}
+                    />
+                  )
                 : <Button size="small" type="dashed" onClick={this.handleShowKeywordInput}>+ 新关键词</Button>
             ) : null
           }
@@ -314,14 +370,7 @@ export class ArticleDetail extends Component {
                 )
               : (
                   <Upload
-                    customRequest={
-                      qiniuRequest({
-                          name: 'jooger',
-                          domain: 'http://oqtnezwt7.bkt.clouddn.com',
-                          uploadUrl: 'http://up-z1.qiniu.com/',
-                          uptoken: 'yvmsQiG7qdCesWCii3nMEMHK-8Ifi7EyRlcY1FmK:32NE450cE3nukeu9wA9Hw2taabQ=:eyJzY29wZSI6Impvb2dlciIsImRlYWRsaW5lIjoxNDk2NzcwMjg0fQ==',
-                      })
-                    }
+                    customRequest={qiniuRequest()}
                     listType="picture-card"
                     fileList={articleModel.thumbs}
                     onPreview={this.handleThumbPreview}
@@ -343,12 +392,30 @@ export class ArticleDetail extends Component {
             <img alt="example" style={{ width: '100%' }} src={thumbPreviewImage} />
           </Modal>
         </FormItem>
+        <FormItem label="扩展项" {...defaultFormItemLayout}>
+          {
+            !editMode
+              ? (
+                  articleModel.extends.length > 0
+                    ? (
+                        articleModel.extends.map(item => (
+                          <div className={styles.extends_item} key={item.key}>
+                            <span className={styles.extends_item_key}>{item.key}</span>
+                            <Tag className={styles.extends_item_value}>{item.value}</Tag>
+                          </div>
+                        ))
+                      )
+                    : '暂无扩展项'
+                )
+              : this.extendsRender()
+          }
+        </FormItem>
       </Form>
     )
   }
   
   render () {
-    const { articleModel, editMode } = this.state
+    const { articleModel, editMode, showComments } = this.state
     const { currentArticle, saving } = this.props
     const markdownEditorValue = {
       text: articleModel.content,
@@ -392,7 +459,9 @@ export class ArticleDetail extends Component {
                     </Popover>
                   </div>
                   <div className={styles.comment}>
-                    <Button className={styles.comment_btn} type="dashed" shape="circle" icon="message" title="评论" />
+                    <Badge count={articleModel.meta.comments}>
+                      <Button className={styles.comment_btn} type="dashed" shape="circle" icon="message" title="评论" onClick={this.handleViewComments} />
+                    </Badge>
                   </div>
                 </div>
                 <div className={styles.bd}>
@@ -411,12 +480,26 @@ export class ArticleDetail extends Component {
                             value={markdownEditorValue}
                             onChange={this.handleEditorValueChange}
                           />
-                        : <div
-                            className={classnames([styles.article_content, 'markdown_body'])}
-                            dangerouslySetInnerHTML={{__html: currentArticle.rendered_content}}
-                          />
+                        : <Card
+                            className={styles.article_content}
+                          >
+                            <div
+                              className="markdown_body"
+                              dangerouslySetInnerHTML={{__html: currentArticle.rendered_content}}
+                            />
+                          </Card>
                     }
                   </div>
+                </div>
+                <div className={styles.aside}>
+                  {
+                    showComments
+                      ? <ArticleComments
+                          articleId={articleModel._id}
+                          onClose={this.handleCloseComments}
+                        />
+                      : null
+                  }
                 </div>
               </div>
             )

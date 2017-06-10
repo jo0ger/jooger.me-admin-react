@@ -65,7 +65,7 @@ export const humpToHyphen = (str) => {
 
 // 首字母大写
 export const firstUpperCase = (str) => {
-  return str.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
+  return str.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase())
 }
 
 export const isType = (obj = {}, type = 'object') => {
@@ -82,6 +82,45 @@ export const buildClassName = (className = '') => {
       ? className.forEach(item => obj[item] = true)
       : (obj = { [className]: true })
   return obj
+}
+
+// shallow copy
+export const copy = function (out = {}) {
+  for (var i = 1; i < arguments.length; i++) {
+    var obj = arguments[i]
+
+    if (!obj) {
+      continue
+    }
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        out[key] = obj[key]
+      }
+    }
+  }
+  return out
+}
+
+// deep copy
+export const deepCopy = function (out = {}) {
+  for (var i = 1; i < arguments.length; i++) {
+    var obj = arguments[i]
+
+    if (!obj) {
+      continue
+    }
+
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (typeof obj[key] === 'object') {
+          out[key] = deepCopy(out[key], obj[key])
+        } else {
+          out[key] = obj[key]
+        }
+      }
+    }
+  }
+  return out
 }
 
 export {
