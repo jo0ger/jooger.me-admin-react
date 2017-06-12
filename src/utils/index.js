@@ -1,6 +1,8 @@
 import classnames from 'classnames'
 import marked from './marked'
 import qiniuRequest from './qiniuUpload'
+import * as commentMetaParser from './commentMetaParser'
+import * as storage from './storage'
 
 export const debounce = (fn, delta = 0, immediate = false) => {
   let can = true
@@ -126,5 +128,7 @@ export const deepCopy = function (out = {}) {
 export {
   classnames,
   marked,
-  qiniuRequest
+  qiniuRequest,
+  commentMetaParser,
+  storage
 }

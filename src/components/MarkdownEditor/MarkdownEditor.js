@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { Icon } from 'antd'
 import styles from './MarkdownEditor.styl'
 import { classnames, marked, debounce } from '~utils'
 import commandList from '~utils/markdownEditorHelper/commands'
@@ -56,11 +57,17 @@ export class MarkdownEditor extends Component {
         this.setState({ compareMode: !this.state.compareMode })
         this.setState({ previewMode: false })
         break
+      case 'upload':
+        this.handleUploadMarkdownFile()
+        break
       default:
         this.executeCommand(cmd)
         break
     }
   }
+
+  // 上传markdown文件
+  handleUploadMarkdownFile () {}
 
   handleValueChange = e => this.props.onChange(e.target.value)
 
@@ -100,15 +107,22 @@ export class MarkdownEditor extends Component {
                 return (
                   <li
                     key={item.key}
-                    className={classnames([styles.command_item, styles[itemClass] || itemClass])} 
+                    className={classnames([styles.command_item, styles[itemClass] || itemClass])}
                     title={item.title}
-                    onClick={this.handleCommandClick(item)}
+                    onClick={this.handleCommandClick(item.key)}
                   >
                     <i className={classnames(['iconfont', `icon-${item.key}`])} />
                   </li>
                 )
               })
             }
+            <li
+              className={classnames([styles.command_item, styles.command_item_upload])}
+              title="上传文件"
+              onClick={this.handleCommandClick({ key: 'upload' })}
+            >
+              <Icon type="cloud-upload" style={{fontSize: 18, lineHeight: 1.25}} />
+            </li>
           </ul>
         </div>
         <div className={styles.bd}>

@@ -7,7 +7,7 @@ import MarkdownEditor from '~components/MarkdownEditor'
 import Thumb from './Thumb'
 import ArticleComments from './ArticleComments'
 import styles from '../assets/ArticleDetail'
-import { fmtDate, classnames, qiniuRequest } from '~utils'
+import { fmtDate, classnames, qiniuRequest, debounce } from '~utils'
 
 const FormItem = Form.Item
 const CheckableTag = Tag.CheckableTag
@@ -52,14 +52,18 @@ const getArticleStatus = state => {
 
 export class ArticleDetail extends Component {
 
-  state = {
-    articleModel: defaultArticleModel,
-    editMode: true,
-    keywordInputVisible: false,
-    keywordInputValue: '',
-    thumbPreviewVisible: false,
-    thumbPreviewImage: '',
-    showComments: true
+  constructor (props) {
+    super(props)
+    this.state = {
+      articleModel: defaultArticleModel,
+      editMode: true,
+      keywordInputVisible: false,
+      keywordInputValue: '',
+      thumbPreviewVisible: false,
+      thumbPreviewImage: '',
+      showComments: true
+    }
+    this.handleAutoSave = this.getAutoSaveDebounceFn()
   }
   
   componentWillMount() {
@@ -68,7 +72,7 @@ export class ArticleDetail extends Component {
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.currentArticle._id !== this.props.currentArticle._id) {
-      this.setState({ editMode: true, showComments: false })
+      this.setState({ editMode: true, showComments: true })
     }
     this.setArticleModel(nextProps)
   }
@@ -86,13 +90,13 @@ export class ArticleDetail extends Component {
     })
   }
 
-  setArticleModelByKey (key, value) {
+  setArticleModelByKey (key, value, cb) {
     this.setState({
       articleModel: {
         ...this.state.articleModel,
         [key]: value
       }
-    })
+    }, () => cb && cb())
   }
 
   handleTitleInputChange = e => this.setArticleModelByKey('title', e.target.value)
@@ -109,6 +113,7 @@ export class ArticleDetail extends Component {
       editMode: false,
     })
   }
+
   handleSave = () => {
     const { editArticleItem, currentArticle } = this.props
     const articleModel = { ...this.state.articleModel }
@@ -188,7 +193,15 @@ export class ArticleDetail extends Component {
 
   handleThumbPreviewCancel = () => this.setState({ thumbPreviewVisible: false })
 
-  handleEditorValueChange = value => this.setArticleModelByKey('content', value)
+  getAutoSaveDebounceFn () {
+    return debounce(() => {
+      this.handleSave()
+    }, 1000)
+  }
+
+  handleEditorValueChange = value => {
+    this.setArticleModelByKey('content', value, this.handleAutoSave)
+  }
 
   handleAddExtendsItem = () => {
     this.setArticleModelByKey('extends', [

@@ -2,20 +2,101 @@
 @import '../../styles/mixins/index'
 
 .comment_item {
+  margin: 0 0 $base-margin 0;
+  border-bottom:1px solid $grey-4;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   .wrapper {
-    flexLayout()
+    flexLayout(, , flex-start)
     position: relative;
     padding: 10px 0;
 
     .avatar {
-      flex: 0 0 36px;
-      width: 36px;
-      height: 36px;
+      flex: 0 0 48px;
+      width: 48px;
+      height: 48px;
     }
 
     .bd {
       flex-grow: 1;
+      margin-left: 10px;
+
+      .meta, .content {
+        margin-bottom: $base-margin;
+      }
+
+      .title {
+        margin-bottom: ($base-margin / 4);
+        font-size: $font-size-lg;
+
+        .reply {
+          margin-left: 10px;
+          font-weight: normal;
+
+          &_text {
+            margin-right: 10px;
+          }
+          
+        }
+
+        .blogger {
+          float: right;
+          margin-right: 10px;
+          color: $blue-6;
+        }
+
+      }
+
+      .meta {
+        position: relative;
+      }
+
+      .content {
+        position: relative;
+      }
+
+      .info {
+        .like, .action_item {
+          margin-left: $base-margin;
+          padding: 2px 5px;
+          background-color: $grey-4;
+          color: $text-color-secondary;
+          
+          span, i {
+            font-size: $font-size-base;
+          }
+
+          span {
+            margin-left: 5px;
+          }
+
+          &:hover {
+            background-color: $grey-5;
+            color: $text-color;
+          }
+        }
+
+        .like {
+          &.is_liking {
+            opacity: .8;
+            cursor: not-allowed;
+          }
+          &.is_liked {
+            color: $red-5;
+            cursor: default;
+            user-select: none;
+          }
+        }
+
+        .actions {
+          float: right;
+          text-align: right;
+        }
+      }
+
     }
 
   }

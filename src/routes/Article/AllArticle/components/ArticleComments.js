@@ -4,7 +4,7 @@ import { Card, Icon, message } from 'antd'
 import Transition from '~components/Transition'
 import NoData from '~components/NoData'
 import { Loading, ReFreshLoading } from '~components/Loading'
-import { CommentList } from '~components/Comment'
+import CommentList from '~components/Comment'
 import styles from '../assets/ArticleComments'
 import Service from '~service'
 
@@ -47,13 +47,19 @@ export class ArticleComments extends Component {
     }
   }
 
+  handleLikeItem = index => {
+    const list = [...this.state.commentList]
+    list[index].likes++
+    this.setState({ commentList: list })
+  }
+
   titleRender () {
     const len = this.state.commentList.length
     return `评论（${this.state.fetching ? '评论获取中...' : (len > 0 ? `${len}条` : '暂无')}）`
   }
   
   render () {
-    const { commentList, fetching, refreshing } = this.state
+    const { commentList, fetching, refreshing, pagination } = this.state
     return (
       <Transition name="slide-right-100">
         <Card
@@ -65,7 +71,12 @@ export class ArticleComments extends Component {
         <div>
           {
             commentList.length
-              ? <CommentList data={commentList} />
+              ? <CommentList
+                  data={commentList}
+                  pagination={pagination}
+                  onLike={this.handleLikeItem}
+                  isTalkList={false}
+                />
               : <NoData show={!fetching && !refreshing} text="暂无评论" />
           }
           <ReFreshLoading loading={refreshing} />

@@ -74,10 +74,11 @@ const Service = {
     getList: wrap('get', '/comment'),
     create: wrap('post', '/comment'),
     batchUpdate: wrap('patch', '/comment'),
-    natchDelete: wrap('delete', '/comment'),
+    batchDelete: wrap('delete', '/comment'),
     getItem: id => wrap('get', `/comment/${id}`),
     editItem: id => wrap('put', `/comment/${id}`),
-    deleteItem: id => wrap('delete', `/comment/${id}`)
+    deleteItem: id => wrap('delete', `/comment/${id}`),
+    like: wrap('post', '/like')
   },
   category: {
     getList: wrap('get', '/category'),

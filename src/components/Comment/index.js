@@ -1,7 +1,10 @@
 import CommentList from './CommentList'
 import CommentItem from './CommentItem'
+import CommentInputBox from './CommentInputBox'
 
 export {
-  CommentList,
-  CommentItem
+  CommentItem,
+  CommentInputBox
 }
+
+export default CommentList
