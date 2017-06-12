@@ -49,7 +49,7 @@ state = {
 > 基本功能
 
 * ~~文章列表及详情~~
-* 文章详情页显示评论，并且可以排序，回复，点赞，以及查看详细对话等
+* 文章详情页显示评论，并且可以分页，排序，回复，点赞，以及查看详细对话等
 * 分类列表及详情
 * 标签列表及详情
 * ~~react markdown editor实现~~（所需基本功能已实现，可以继续增加新功能）
@@ -68,3 +68,16 @@ state = {
 * github项目管理
 * 权限管理？ （这个应该暂时不会加，没有涉及多用户，可扩展）
 
+## Screenshots
+
+### 文章详情页
+
+![article_detail](https://raw.githubusercontent.com/jo0ger/jooger.me-admin/master/screenshots/article_detail.png)
+
+### MarkdownEditor
+
+![markdown_editor](https://raw.githubusercontent.com/jo0ger/jooger.me-admin/master/screenshots/markdown_editor.png)
+
+### 文章评论
+
+![article_comment](https://raw.githubusercontent.com/jo0ger/jooger.me-admin/master/screenshots/article_comment.png)

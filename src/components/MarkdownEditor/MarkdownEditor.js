@@ -109,7 +109,7 @@ export class MarkdownEditor extends Component {
                     key={item.key}
                     className={classnames([styles.command_item, styles[itemClass] || itemClass])}
                     title={item.title}
-                    onClick={this.handleCommandClick(item.key)}
+                    onClick={this.handleCommandClick(item)}
                   >
                     <i className={classnames(['iconfont', `icon-${item.key}`])} />
                   </li>
