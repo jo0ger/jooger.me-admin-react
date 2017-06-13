@@ -1,4 +1,4 @@
-import defaultAvatar from '~static/img/avatar/boy-13.png'
+import defaultAvatar from '~static/img/avatar/avatar.jpg'
 
 export default {
   defaultAvatar

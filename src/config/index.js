@@ -1,7 +1,3 @@
-import menu from './menu'
-import constant from './constant'
-
-export {
-  menu,
-  constant
-}
+export { default as menu } from './menu'
+export { default as constant } from './constant'
+export { default as admin } from './admin'

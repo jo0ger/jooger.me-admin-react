@@ -1,4 +1,37 @@
 @import '../../styles/vars/index'
 @import '../../styles/mixins/index'
 
+.comment_input_box {
+  
+  .mde {
+    border:1px solid $grey-4;
 
+
+    .md_reply {
+      float: right;
+      width: (2.5 * $md-command-item-height-mini);
+      color: $white;
+      background-color: $blue-6;
+
+      &:hover {
+        color: $white;
+        background-color: $blue-7;
+      }
+
+      i {
+        margin-right: 5px;
+      }
+      
+    }
+
+  }
+
+  &.to_article_input_box {
+    .mde {
+      border-top: none;
+      border-right: none;
+      border-left: none;
+    }
+  }
+
+}

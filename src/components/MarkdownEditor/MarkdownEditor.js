@@ -1,43 +1,53 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Icon } from 'antd'
 import styles from './MarkdownEditor.styl'
 import { classnames, marked, debounce } from '~utils'
-import commandList from '~utils/markdownEditorHelper/commands'
 import { getSelection, setSelection } from '~utils/markdownEditorHelper/selectionHelper'
+import commands from '~utils/markdownEditorHelper/commands'
+
+const defaultCommands = commands.getDefaultCommands()
 
 export class MarkdownEditor extends Component {
+
+  static defaultProps = {
+    commands: defaultCommands,
+    customClass: '',
+    bodyHeight: null,
+    mini: false,
+    autoCompare: true
+  }
 
   constructor (props) {
     super(props)
     this.state = {
-      editContent: props.content,
       fullscreenMode: false,
       previewMode: false,
-      compareMode: true,
+      compareMode: props.autoCompare,
       previewContent: ''
     }
     this.setPreviewContent = this.getPreviewContentDebounceFn()
   }
   
   componentWillMount() {
-    this.setPreviewContent(this.props.value.text)
+    this.setPreviewContent()
   }
   
   componentWillReceiveProps (nextProps) {
-    const { text } = nextProps.value
-    if (text !== this.props.value.text) {
-      this.setPreviewContent(text)
+    if (nextProps.value !== this.props.value) {
+      this.setPreviewContent(nextProps.value)
     }
   }
 
   setTextarea = node => this._textarea = node
 
   getPreviewContentDebounceFn () {
-    return debounce((content = '') => {
-      this.setState({
-        previewContent: marked(content)
-      })
+    return debounce((content = this.props.value) => {
+      const { previewMode, compareMode } = this.state
+      if (previewMode || compareMode) {
+        this.setState({
+          previewContent: (content && marked(content)) || ''
+        })
+      }
     }, 200)
   }
 
@@ -50,15 +60,16 @@ export class MarkdownEditor extends Component {
         this.setState({ fullscreenMode: false })
         break
       case 'preview':
-        this.setState({ previewMode: !this.state.previewMode })
-        this.setState({ compareMode: false })
+        this.setState({
+          previewMode: !this.state.previewMode,
+          compareMode: false
+        }, () => this.setPreviewContent())
         break
       case 'compare':
-        this.setState({ compareMode: !this.state.compareMode })
-        this.setState({ previewMode: false })
-        break
-      case 'upload':
-        this.handleUploadMarkdownFile()
+        this.setState({
+          compareMode: !this.state.compareMode,
+          previewMode: false
+        }, () => this.setPreviewContent())
         break
       default:
         this.executeCommand(cmd)
@@ -66,14 +77,11 @@ export class MarkdownEditor extends Component {
     }
   }
 
-  // 上传markdown文件
-  handleUploadMarkdownFile () {}
-
   handleValueChange = e => this.props.onChange(e.target.value)
 
   executeCommand (cmd) {
-    const { value: { text } } = this.props
-    const newValue = cmd.execute ? cmd.execute(text, getSelection(this._textarea)) : null
+    const { value } = this.props
+    const newValue = cmd.execute ? cmd.execute(value, getSelection(this._textarea)) : null
     if (!newValue) {
       return
     }
@@ -86,51 +94,55 @@ export class MarkdownEditor extends Component {
 
   render () {
     const { fullscreenMode, previewMode, compareMode, previewContent } = this.state
-    const { value: { text } } = this.props
-
+    const { commands, value, customClass, bodyHeight, mini } = this.props
+    
     return (
       <div className={classnames({
           [styles.markdown_editor]: true,
+          [styles.mini_mode]: mini,
           [styles.fullscreen_mode]: fullscreenMode,
           [styles.preview_mode]: previewMode,
-          [styles.compare_mode]: compareMode
+          [styles.compare_mode]: compareMode,
+          [customClass]: true
         })}
       >
-        <div className={styles.hd}>
-          <ul className={styles.command_list}>
-            {
-              commandList.map(item => {
-                const itemClass = `command_item_${item.key}`
-                if ((fullscreenMode && item.key === 'grow') || (!fullscreenMode && item.key === 'shrink')) {
-                  return null
-                }
-                return (
-                  <li
-                    key={item.key}
-                    className={classnames([styles.command_item, styles[itemClass] || itemClass])}
-                    title={item.title}
-                    onClick={this.handleCommandClick(item)}
-                  >
-                    <i className={classnames(['iconfont', `icon-${item.key}`])} />
-                  </li>
-                )
-              })
-            }
-            <li
-              className={classnames([styles.command_item, styles.command_item_upload])}
-              title="上传文件"
-              onClick={this.handleCommandClick({ key: 'upload' })}
-            >
-              <Icon type="cloud-upload" style={{fontSize: 18, lineHeight: 1.25}} />
-            </li>
-          </ul>
-        </div>
-        <div className={styles.bd}>
+        {
+          !commands.length
+            ? null
+            : (
+                <div className={styles.hd}>
+                  <ul className={styles.command_list}>
+                    {
+                      commands.map(item => {
+                        const itemClass = `command_item_${item.key}`
+                        if ((fullscreenMode && item.key === 'grow') || (!fullscreenMode && item.key === 'shrink')) {
+                          return null
+                        }
+                        return (
+                          <li
+                            key={item.key}
+                            className={classnames([styles.command_item, styles[itemClass] || itemClass, item.customClass])}
+                            title={item.title}
+                            onClick={this.handleCommandClick(item)}
+                          >
+                            <i className={classnames(['iconfont', `icon-${item.key}`])} />
+                            {
+                              item.text && <span>{item.text}</span>
+                            }
+                          </li>
+                        )
+                      })
+                    }
+                  </ul>
+                </div>
+              )
+        }
+        <div className={styles.bd} style={{height: bodyHeight}}>
           <div className={styles.edit_pane}>
             <textarea
               className={styles.input_area}
               onChange={this.handleValueChange}
-              value={text}
+              value={value}
               ref={this.setTextarea}
             />
           </div>
@@ -142,11 +154,12 @@ export class MarkdownEditor extends Component {
 }
 
 MarkdownEditor.propTypes = {
-  content: PropTypes.string,
-  value: PropTypes.shape({
-    text: PropTypes.string.isRequired,
-    selection: PropTypes.arrayOf(PropTypes.number)
-  }).isRequired,
+  commands: PropTypes.array,
+  value: PropTypes.string.isRequired,
+  customClass: PropTypes.string,
+  bodyHeight: PropTypes.number,
+  mini: PropTypes.bool,
+  autoCompare: PropTypes.bool,
   onChange: PropTypes.func.isRequired
 }
 

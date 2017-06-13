@@ -18,13 +18,14 @@
       flex: 0 0 48px;
       width: 48px;
       height: 48px;
+      border-radius: 50%;
     }
 
     .bd {
       flex-grow: 1;
       margin-left: 10px;
 
-      .meta, .content {
+      .meta, .content, .info {
         margin-bottom: $base-margin;
       }
 
@@ -52,6 +53,9 @@
 
       .meta {
         position: relative;
+        .os {
+          margin-right: 10px;
+        }
       }
 
       .content {
@@ -94,6 +98,14 @@
         .actions {
           float: right;
           text-align: right;
+
+          .reply {
+            &.show {
+              background-color: $grey-5;
+              color: $text-color;
+            }
+          }
+
         }
       }
 

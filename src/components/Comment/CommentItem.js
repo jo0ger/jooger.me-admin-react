@@ -2,18 +2,42 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Icon } from 'antd'
 import styles from './CommentItem.styl'
+import CommentInputBox from './CommentInputBox'
 import { constant } from '~config'
 import { classnames, commentMetaParser, fmtDate } from '~utils'
 
 const { UAParse, OSParse } = commentMetaParser
 
 export class CommentItem extends Component {
-  
+
+  static defaultProps = {
+    talkOpened: false,
+    replyOpened: false
+  }
+
   handleLike = () => {
     if (this.props.isLiked) {
       return
     }
-    this.props.onLike()
+    this.props.onLike(this.props.isTalk)
+  }
+
+  handleToggleDisplayReply = () => {
+    const { data, onToggleDisplayReply, replyOpened, isTalk } = this.props
+    onToggleDisplayReply(data._id, !replyOpened, isTalk)
+  }
+
+  handleReply = () => {}
+
+  handleSubmit = (value, cb) => {
+    const { onReply, data, isTalk, index } = this.props
+    onReply({
+      value,
+      replyId: data._id,
+      isTalk,
+      index,
+      cb
+    })
   }
 
   titleRender () {
@@ -90,7 +114,7 @@ export class CommentItem extends Component {
   }
 
   infoRender () {
-    const { data, likeFetching, isLiked, isReplying, isTalk, talkOpened, onViewTalk } = this.props
+    const { data, likeFetching, isLiked, isTalk, talkOpened, replyOpened, onViewTalk } = this.props
     return (
       <div className={styles.info}>
         <span className={styles.date}>{fmtDate(data.create_at)}</span>
@@ -123,11 +147,12 @@ export class CommentItem extends Component {
             className={classnames({
               [styles.action_item]: true,
               [styles.reply]: true,
-              [styles.show]: isReplying
+              [styles.show]: replyOpened
             })}
+            onClick={this.handleToggleDisplayReply}
           >
             <i className={classnames(['iconfont', 'icon-reply'])} />
-            <span>{ isReplying ? '取消回复' : '回复' }</span>
+            <span>{ replyOpened ? '取消回复' : '回复' }</span>
           </a>
         </div>
       </div>
@@ -135,7 +160,7 @@ export class CommentItem extends Component {
   }
 
   render () {
-    const { data } = this.props
+    const { data, replyOpened } = this.props
     return (
       <div className={styles.comment_item}>
         <div className={styles.wrapper}>
@@ -145,6 +170,16 @@ export class CommentItem extends Component {
             {this.metaRender()}
             {this.contentRender()}
             {this.infoRender()}
+            {
+              replyOpened
+                ? (
+                    <CommentInputBox
+                      value
+                      onSubmit={this.handleSubmit}
+                    />
+                  )
+                : null
+            }
           </div>
         </div>
       </div>
@@ -154,14 +189,17 @@ export class CommentItem extends Component {
 }
 
 CommentItem.propTypes = {
+  index: PropTypes.number.isRequired,
   data: PropTypes.object.isRequired,
   likeFetching: PropTypes.bool.isRequired,
   isLiked: PropTypes.bool.isRequired,
   isTalk: PropTypes.bool.isRequired,
-  isReplying: PropTypes.bool.isRequired,
-  talkOpened: PropTypes.bool.isRequired,
+  talkOpened: PropTypes.bool,
+  replyOpened: PropTypes.bool,
   onLike: PropTypes.func.isRequired,
-  onViewTalk: PropTypes.func.isRequired
+  onViewTalk: PropTypes.func.isRequired,
+  onToggleDisplayReply: PropTypes.func.isRequired,
+  onReply: PropTypes.func.isRequired
 }
 
 export default CommentItem

@@ -5,7 +5,7 @@ import {
   makeCode
 } from './commandsHelper'
 
-export default [
+const defaultCommands = [
   { 
     key: 'bold',
     title: '加粗',
@@ -51,20 +51,32 @@ export default [
     title: '图片',
     execute: (text, selection) => makeCommandByInsertBeforeAndAfter(text, selection, '![', '](imgUrl)')
   },
-  { 
+  {
     key: 'preview',
     title: '预览'
   },
-  { 
+  {
     key: 'compare',
     title: '对照'
   },
-  { 
+  {
     key: 'grow',
     title: '全屏'
   },
-  { 
+  {
     key: 'shrink',
     title: '缩放'
   }
 ]
+
+export default {
+  getDefaultCommands () {
+    return defaultCommands
+  },
+  extend (commands = []) {
+    if (!Array.isArray(commands)) {
+      throw new Error('扩展Commands必须是数组类型')
+    }
+    return defaultCommands.concat(commands)
+  }
+}

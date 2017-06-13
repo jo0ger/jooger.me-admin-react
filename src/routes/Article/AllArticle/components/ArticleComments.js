@@ -4,9 +4,11 @@ import { Card, Icon, message } from 'antd'
 import Transition from '~components/Transition'
 import NoData from '~components/NoData'
 import { Loading, ReFreshLoading } from '~components/Loading'
+import { CommentInputBox } from '~components/Comment'
 import CommentList from '~components/Comment'
 import styles from '../assets/ArticleComments'
 import Service from '~service'
+import { admin } from '~config'
 
 export class ArticleComments extends Component {
 
@@ -19,7 +21,7 @@ export class ArticleComments extends Component {
       current_page: 0,
       total_page: 0,
       per_page: 10
-    },
+    }
   }
 
   componentWillMount () {
@@ -53,6 +55,32 @@ export class ArticleComments extends Component {
     this.setState({ commentList: list })
   }
 
+  handleReply = (value, cb) => {
+    Service.comment.create({
+      data: {
+        page_id: this.props.articleId,
+        type: 0,
+        author: admin,
+        content: value
+      }
+    }).then(({ code, data }) => {
+      if (!code) {
+        this.handleAddComment(data)
+        cb && cb()
+      }
+      return !code
+    }).catch(err => message.error(err.message || err))
+  }
+
+  handleAddComment = comment => {
+    if (!comment || !comment._id) {
+      return
+    }
+    this.setState({
+      commentList: [comment, ...this.state.commentList]
+    })
+  }
+
   titleRender () {
     const len = this.state.commentList.length
     return `评论（${this.state.fetching ? '评论获取中...' : (len > 0 ? `${len}条` : '暂无')}）`
@@ -60,6 +88,8 @@ export class ArticleComments extends Component {
   
   render () {
     const { commentList, fetching, refreshing, pagination } = this.state
+    const { articleId } = this.props
+
     return (
       <Transition name="slide-right-100">
         <Card
@@ -69,13 +99,20 @@ export class ArticleComments extends Component {
           extra={<Icon className={styles.close_btn} type="close" onClick={this.props.onClose} />}
         >
         <div>
+          <CommentInputBox
+            toArticle
+            onSubmit={this.handleReply}
+          />
           {
             commentList.length
               ? <CommentList
+                  style={{top: 266}}
+                  pageId={articleId}
                   data={commentList}
                   pagination={pagination}
-                  onLike={this.handleLikeItem}
                   isTalkList={false}
+                  onLike={this.handleLikeItem}
+                  onAddComment={this.handleAddComment}
                 />
               : <NoData show={!fetching && !refreshing} text="暂无评论" />
           }

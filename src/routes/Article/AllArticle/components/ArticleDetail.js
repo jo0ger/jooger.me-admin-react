@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Button, Form, Input, Popover, Tag, Icon, Radio, Upload, Modal, Col, Badge, Card } from 'antd'
 import NoData from '~components/NoData'
 import MarkdownEditor from '~components/MarkdownEditor'
+import commands from '~utils/markdownEditorHelper/commands'
 import Thumb from './Thumb'
 import ArticleComments from './ArticleComments'
 import styles from '../assets/ArticleDetail'
@@ -61,7 +62,17 @@ export class ArticleDetail extends Component {
       keywordInputValue: '',
       thumbPreviewVisible: false,
       thumbPreviewImage: '',
-      showComments: true
+      showComments: false,
+      mdeCommands: commands.extend([
+        {
+          key: 'upload',
+          title: '上传MD文件',
+          customClass: styles.md_upload,
+          execute (value, selection) {
+            this.handleUploadMarkdownFile()
+          }
+        }
+      ])
     }
     this.handleAutoSave = this.getAutoSaveDebounceFn()
   }
@@ -72,7 +83,7 @@ export class ArticleDetail extends Component {
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.currentArticle._id !== this.props.currentArticle._id) {
-      this.setState({ editMode: true, showComments: true })
+      this.setState({ editMode: true, showComments: false })
     }
     this.setArticleModel(nextProps)
   }
@@ -199,9 +210,7 @@ export class ArticleDetail extends Component {
     }, 1000)
   }
 
-  handleEditorValueChange = value => {
-    this.setArticleModelByKey('content', value, this.handleAutoSave)
-  }
+  handleEditorValueChange = value => (this.setArticleModelByKey('content', value, this.handleAutoSave))
 
   handleAddExtendsItem = () => {
     this.setArticleModelByKey('extends', [
@@ -228,6 +237,9 @@ export class ArticleDetail extends Component {
   handleViewComments = () => this.setState({ showComments: !this.state.showComments })
 
   handleCloseComments = () => this.setState({ showComments: false })
+
+  // 上传markdown文件
+  handleUploadMarkdownFile = () => {}
 
   metaRender () {
     const metas = [
@@ -428,12 +440,8 @@ export class ArticleDetail extends Component {
   }
   
   render () {
-    const { articleModel, editMode, showComments } = this.state
+    const { articleModel, editMode, showComments, mdeCommands } = this.state
     const { currentArticle, saving } = this.props
-    const markdownEditorValue = {
-      text: articleModel.content,
-      selection: null
-    }
 
     return (
       <div className={styles.article_detail}>
@@ -490,7 +498,8 @@ export class ArticleDetail extends Component {
                     {
                       editMode
                         ? <MarkdownEditor
-                            value={markdownEditorValue}
+                            commands={mdeCommands}
+                            value={articleModel.content}
                             onChange={this.handleEditorValueChange}
                           />
                         : <Card

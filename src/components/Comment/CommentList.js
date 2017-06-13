@@ -5,6 +5,7 @@ import styles from './CommentList.styl'
 import CommentItem from './CommentItem'
 import Service from '~service'
 import { storage } from '~utils'
+import { admin } from '~config'
 
 const { JOOGER_USER_LIKE_HISTORY, getStorageItem, setStorageItem } = storage
 
@@ -20,7 +21,7 @@ export class CommentList extends Component {
         articles: [],
         comments: []
       },
-      currentTalkCommentId: '',
+      talkCommentId: '',
       showTalkModal: false,
       currentTalkList: [],
       talkFetching: false
@@ -46,7 +47,7 @@ export class CommentList extends Component {
     return this.state.historyLikes.comments.indexOf(commentId) > -1
   }
 
-  handleLike = (id, index) => e => {
+  handleLike = (id, index) => isTalk => {
     if (this.state.likeFetching) {
       return
     }
@@ -64,7 +65,16 @@ export class CommentList extends Component {
         }
         setStorageItem(JOOGER_USER_LIKE_HISTORY, JSON.stringify(newHistoryLikes))
         this.setState({ historyLikes: newHistoryLikes })
-        this.props.onLike(index)
+
+        let commentIndex = index
+        if (isTalk) {
+          // talk的话需要更新Modal内的talkList
+          commentIndex = this.props.data.findIndex(item => item._id === id)
+          const talkList = [...this.state.currentTalkList]
+          talkList[index].likes++
+          this.setState({ currentTalkList: talkList })
+        }
+        this.props.onLike(commentIndex)
       }
     }).catch(err => {
       console.error(err)
@@ -75,7 +85,7 @@ export class CommentList extends Component {
   handleViewTalk = commentId => () => {
     this.setState({
       showTalkModal: true,
-      currentTalkCommentId: commentId,
+      talkCommentId: commentId,
       talkFetching: true
     })
     Service.comment.getItem(commentId)().then(({ code, data }) => {
@@ -91,19 +101,58 @@ export class CommentList extends Component {
       }
     }).catch(err => {
       console.error(err)
-      message.error(err.message || '查看对话错出现错误，请查看控制台')
+      message.error(err.message || '查看对话出现错误，请查看控制台')
     })
   }
 
   handleCloseTalk = () => {
     this.setState({
       showTalkModal: false
-    }, () => (this.setState({ currentTalkList: [] })))
+    }, () => (this.setState({ currentTalkList: [], talkCommentId: '' })))
+  }
+
+  handleToggleDisplayReply = (id, shouldOpen, isTalk) => {
+    this.setState({
+      [isTalk ? 'talkReplyingId' : 'replyingId']: shouldOpen ? id : ''
+    })
+  }
+
+  handleReply = ({value, replyId, isTalk, index, cb}) => {
+    const { currentTalkList } = this.state
+    const { pageId, onAddComment } = this.props
+    const data = {
+      page_id: pageId,
+      content: value,
+      author: admin,
+      type: 0
+    }
+    if (isTalk) {
+      const talkParent = currentTalkList[0]
+      const forwardTalk = talkParent[index - 1]
+      data.parent = talkParent._id
+      data.forward = (forwardTalk && forwardTalk._id) || talkParent._id
+    } else {
+      data.forward = data.parent = replyId
+    }
+    return Service.comment.create({ data }).then(({ code, data }) => {
+      if (!code) {
+        onAddComment(data)
+        cb && cb()
+        this.setState({
+          replyingId: '',
+          talkReplyingId: ''
+        })
+      }
+      return !code
+    }).catch(err => {
+      console.error(err.message)
+      message.error(err.message || '回复评论出现错误，请查看控制台')
+    })
   }
 
   render () {
     const { data, isTalkList } = this.props
-    const { replyingId, talkReplyingId, likeFetching, showTalkModal, currentTalkCommentId, currentTalkList } = this.state
+    const { replyingId, talkReplyingId, likeFetching, showTalkModal, talkCommentId, currentTalkList } = this.state
 
     return (
       <div className={styles.comment_list}>
@@ -112,6 +161,7 @@ export class CommentList extends Component {
             data.map((item, index) => (
               <CommentItem
                 key={item._id}
+                index={index}
                 data={item}
                 isReplying={talkReplyingId === item._id}
                 isLiked={this.checkLiked(item._id)}
@@ -119,7 +169,10 @@ export class CommentList extends Component {
                 isTalk={isTalkList}
                 onLike={this.handleLike(item._id, index)}
                 onViewTalk={this.handleViewTalk(item._id)}
-                talkOpened={currentTalkCommentId === item._id}
+                talkOpened={talkCommentId === item._id}
+                replyOpened={replyingId === item._id}
+                onToggleDisplayReply={this.handleToggleDisplayReply}
+                onReply={this.handleReply}
               />
             ))
           }
@@ -138,14 +191,16 @@ export class CommentList extends Component {
               return (
                 <CommentItem
                   key={item._id}
+                  index={index}
                   data={item}
-                  isReplying={replyingId === item._id}
                   isLiked={this.checkLiked(item._id)}
                   likeFetching={likeFetching}
-                  isTalk={!!item._id}
+                  isTalk
+                  replyOpened={talkReplyingId === item._id}
                   onLike={this.handleLike(item._id, index)}
                   onViewTalk={this.handleViewTalk(item._id)}
-                  talkOpened={currentTalkCommentId === item._id}
+                  onToggleDisplayReply={this.handleToggleDisplayReply}
+                  onReply={this.handleReply}
                 />
               )
             })
@@ -158,10 +213,12 @@ export class CommentList extends Component {
 }
 
 CommentList.propTypes = {
+  pageId: PropTypes.string.isRequired,
   data: PropTypes.array.isRequired,
   pagination: PropTypes.object.isRequired,
+  isTalkList: PropTypes.bool.isRequired,
   onLike: PropTypes.func.isRequired,
-  isTalkList: PropTypes.bool.isRequired
+  onAddComment: PropTypes.func.isRequired
 }
 
 export default CommentList

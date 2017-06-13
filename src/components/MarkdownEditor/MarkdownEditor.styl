@@ -1,8 +1,6 @@
 @import '../../styles/vars/index'
 @import '../../styles/mixins/index'
 
-$command-item-height            = 35px
-
 .markdown_editor {
   position: relative;
   width: 100%;
@@ -14,9 +12,9 @@ $command-item-height            = 35px
 
     .command_item {
       display: inline-block;
-      width: $command-item-height ;
-      height: $command-item-height ;
-      line-height: ($command-item-height  - 2 * 5px);
+      width: $md-command-item-height;
+      height: $md-command-item-height;
+      line-height: ($md-command-item-height  - 2 * 5px);
       padding: 5px;
       text-align: center;
       cursor: pointer;
@@ -30,20 +28,13 @@ $command-item-height            = 35px
       i {
         font-size: $font-size-lg;
       }
-
-      &.command_item_upload {
-        float: right;
-        width: (2 * $command-item-height);
-      }
-
     }
     
   }
 
   .bd {
-    full()
-    top: 35px;
-    min-height: "calc(100vh - %s - 60px - %s)" % ($header-height $command-item-height);
+    position: relative;
+    height: "calc(100vh - %s - 60px - %s)" % ($header-height $md-command-item-height);
   }
 
   .edit_pane, .preview_pane {
@@ -63,13 +54,32 @@ $command-item-height            = 35px
       padding: $base-padding;
       border: none;
       outline: none;
+      resize: none;
     }
   }
 
   .preview_pane {
     width: 0;
-    padding: $base-padding;
+    padding: 0;
     background: alpha($blue-6, .01);
+  }
+
+  &.mini_mode {
+    .command_item {
+      width: $md-command-item-height-mini;
+      height: $md-command-item-height-mini;
+      line-height: ($md-command-item-height-mini  - 2 * 3px);
+      padding: 3px;
+
+      i {
+        font-size: $font-size-base;
+      }
+
+    }
+
+    .edit_pane .input_area {
+      padding: ($base-padding / 2);
+    }
   }
 
   &.fullscreen_mode {
@@ -79,6 +89,23 @@ $command-item-height            = 35px
     bottom: 0;
     left: 0;
     z-index: $zindex-modal;
+
+    .command_item {
+      width: $md-command-item-height;
+      height: $md-command-item-height;
+      line-height: ($md-command-item-height  - 2 * 5px);
+      padding: 5px;
+
+      i {
+        font-size: $font-size-lg;
+      }
+
+    }
+
+    .bd {
+      height: "calc(100vh - %s) !important" % $md-command-item-height;
+    }
+
   }
 
   &.preview_mode {
@@ -93,6 +120,7 @@ $command-item-height            = 35px
 
     .preview_pane {
       width: 100%;
+      padding: $base-padding;
     }
   }
 
@@ -112,6 +140,7 @@ $command-item-height            = 35px
     }
 
     .preview_pane {
+      padding: $base-padding;
     }
   }
 
