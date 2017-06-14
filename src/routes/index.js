@@ -1,6 +1,7 @@
 import React from 'react'
 import Bundle from '~components/Bundle'
 import AppLayout from '~layouts/AppLayout'
+import Login from './Login'
 import Home from './Home'
 import { AllArticleLoader } from './Article'
 import PageNotFound from './PageNotFound'
@@ -31,6 +32,12 @@ export const createRoutes = store => {
           to: '/article/all',
           push: false
         }
+      },
+      {
+        path: '/login',
+        name: 'Login',
+        component: Login,
+        exact: true
       },
       {
         path: '/home',

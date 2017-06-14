@@ -1,7 +1,7 @@
 import Loading from './Loading'
-import ReFreshLoading from './ReFreshLoading'
+import RefreshLoading from './RefreshLoading'
 
 export {
   Loading,
-  ReFreshLoading
+  RefreshLoading
 }

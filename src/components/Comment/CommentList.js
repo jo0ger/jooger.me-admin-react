@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { message, Modal } from 'antd'
 import styles from './CommentList.styl'
 import CommentItem from './CommentItem'
+import { RefreshLoading } from '../Loading'
 import Service from '~service'
 import { storage } from '~utils'
 import { admin } from '~config'
@@ -83,6 +84,9 @@ export class CommentList extends Component {
   }
 
   handleViewTalk = commentId => () => {
+    if (this.state.talkFetching) {
+      return
+    }
     this.setState({
       showTalkModal: true,
       talkCommentId: commentId,
@@ -152,7 +156,7 @@ export class CommentList extends Component {
 
   render () {
     const { data, isTalkList } = this.props
-    const { replyingId, talkReplyingId, likeFetching, showTalkModal, talkCommentId, currentTalkList } = this.state
+    const { replyingId, talkReplyingId, likeFetching, showTalkModal, talkCommentId, currentTalkList, talkFetching } = this.state
 
     return (
       <div className={styles.comment_list}>
@@ -205,6 +209,7 @@ export class CommentList extends Component {
               )
             })
           }
+          <RefreshLoading loading={talkFetching} />
         </Modal>
       </div>
     )

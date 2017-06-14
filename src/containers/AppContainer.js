@@ -40,7 +40,7 @@ class AppContainer extends Component {
   }
   
   render () {
-    const { store, routes } = this.props
+    const { store, routes, children } = this.props
 
     return (
       <Provider store={store}>
@@ -48,7 +48,7 @@ class AppContainer extends Component {
           <Router basename={routes.basename || '/'}>
             <Route render={this.layoutRender} />
           </Router>
-          { this.props.children }
+          { children }
         </div>
       </Provider>
     )

@@ -1,0 +1,34 @@
+@import '../../../styles/vars/index'
+@import '../../../styles/mixins/index'
+
+.page_login {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -160px 0 0 -160px;
+  width: 320px;
+  height: 250px;
+  padding: 36px;
+  box-shadow: 0 0 100px rgba($black, .08);
+
+  .logo {
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: (2 * $base-margin);
+    text-align: center;
+
+    .title {
+      vertical-align: text-bottom;
+      font-size: 20px;
+      text-transform: uppercase;
+      display: inline-block;
+      letter-spacing: 1px;
+    }
+
+  }
+
+  button {
+    width: 100%;
+  }
+  
+}

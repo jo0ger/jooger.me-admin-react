@@ -26,10 +26,7 @@ export class ArticleList extends Component {
 
   handleToolMenuClick = id => item => this.props.onToolClick(item.key, id)
 
-  handleForeverDeleteItem = id => () => {
-    console.log(id)
-    this.props.onForeverDeleteItem(id)
-  }
+  handleForeverDeleteItem = id => () => this.props.onForeverDeleteItem(id)
 
   render () {
     const { articleList, currentArticleId } = this.props

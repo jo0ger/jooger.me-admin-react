@@ -1,14 +1,17 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Icon, message } from 'antd'
+import { Card, Icon, message, Radio } from 'antd'
 import Transition from '~components/Transition'
 import NoData from '~components/NoData'
-import { Loading, ReFreshLoading } from '~components/Loading'
+import InfiniteScroll from '~components/InfiniteScroll'
 import { CommentInputBox } from '~components/Comment'
 import CommentList from '~components/Comment'
 import styles from '../assets/ArticleComments'
 import Service from '~service'
 import { admin } from '~config'
+
+const RadioButton = Radio.Button
+const RadioGroup = Radio.Group
 
 export class ArticleComments extends Component {
 
@@ -21,7 +24,8 @@ export class ArticleComments extends Component {
       current_page: 0,
       total_page: 0,
       per_page: 10
-    }
+    },
+    sort: 0     // 0 时间倒序 1 时间正序 2 点赞数倒序
   }
 
   componentWillMount () {
@@ -29,7 +33,7 @@ export class ArticleComments extends Component {
   }
 
   async fetchCommentList (refresh = false) {
-    const { commentList, pagination, fetching, refreshing } = this.state
+    const { commentList, pagination, fetching, refreshing, sort } = this.state
     if (fetching || refreshing) {
       return message.info('正在获取评论...')
     }
@@ -37,7 +41,8 @@ export class ArticleComments extends Component {
     const { code, data } = await Service.comment.getList({
       params: {
         page_id: this.props.articleId,
-        page: pagination.current_page + 1
+        page: refresh ? 1 : pagination.current_page + 1,
+        sort
       }
     })
     this.setState({ [refresh ? 'refreshing' : 'fetching']: false })
@@ -81,14 +86,40 @@ export class ArticleComments extends Component {
     })
   }
 
+  handleLoadmore = () => {
+    const { pagination } = this.state
+    if (pagination.current_page >= pagination.total_page) {
+      return
+    }
+    this.fetchCommentList(false)
+  }
+
+  handleSort = e => {this.setState({ sort: e.target.value }, () => this.fetchCommentList(true))}
+
   titleRender () {
     const len = this.state.commentList.length
-    return `评论（${this.state.fetching ? '评论获取中...' : (len > 0 ? `${len}条` : '暂无')}）`
+    return `评论（${len > 0 ? `${len}条` : '暂无'}）`
+  }
+
+  titleExtraRender () {
+    const { sort } = this.state
+    return (
+      <div>
+        <RadioGroup onChange={this.handleSort} value={sort} size="small">
+          <RadioButton value={0}>最新</RadioButton>
+          <RadioButton value={1}>最久</RadioButton>
+          <RadioButton value={2}>最热</RadioButton>
+        </RadioGroup>
+        <Icon className={styles.close_btn} type="close" onClick={this.props.onClose} />
+      </div>
+    )
   }
   
   render () {
     const { commentList, fetching, refreshing, pagination } = this.state
     const { articleId } = this.props
+
+    console.log('articleId')
 
     return (
       <Transition name="slide-right-100">
@@ -96,9 +127,15 @@ export class ArticleComments extends Component {
           key="comments"
           className={styles.article_comments}
           title={this.titleRender()}
-          extra={<Icon className={styles.close_btn} type="close" onClick={this.props.onClose} />}
+          extra={this.titleExtraRender()}
         >
-        <div>
+        <InfiniteScroll
+          customClass={styles.list_wrapper}
+          onLoadmore={this.handleLoadmore}
+          loading={fetching}
+          refreshing={refreshing}
+          noMoreData={pagination.current_page >= pagination.total_page}
+        >
           <CommentInputBox
             toArticle
             onSubmit={this.handleReply}
@@ -116,9 +153,7 @@ export class ArticleComments extends Component {
                 />
               : <NoData show={!fetching && !refreshing} text="暂无评论" />
           }
-          <ReFreshLoading loading={refreshing} />
-          <Loading loading={fetching} />
-        </div>
+        </InfiniteScroll>
         </Card>
       </Transition>
     )

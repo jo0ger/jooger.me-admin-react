@@ -5,16 +5,28 @@ import Sider from '~layouts/Sider'
 import ViewPort from '~layouts/ViewPort'
 import styles from './AppLayout.styl'
 
-export const AppLayout = ({ children, location }) => {
+const singlePage = ['/login']
+
+export const AppLayout = ({ children, location}) => {
+
   return (
     <div className={styles.app_layout}>
-      <Header />
-      <div className={styles.main_container}>
-        <Sider location={location} />
-        <ViewPort>
-          {children}
-        </ViewPort>
-      </div>
+      {
+        singlePage.includes(location.pathname)
+          ? children
+          : (
+              <div>
+                <Header />
+                <div className={styles.main_container}>
+                  <Sider location={location} />
+                  <ViewPort>
+                    {children}
+                  </ViewPort>
+                </div>
+              </div>
+            )
+      }
+      
     </div>
   )
 }

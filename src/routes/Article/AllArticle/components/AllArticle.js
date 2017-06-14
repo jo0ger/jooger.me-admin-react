@@ -7,7 +7,6 @@ import ArticleList from './ArticleList'
 import ArticleDetail from '../containers/ArticleDetailContainer'
 import InfiniteScroll from '~components/InfiniteScroll'
 import NoData from '~components/NoData'
-import { Loading, ReFreshLoading } from '~components/Loading'
 import styles from '../assets/AllArticle'
 
 const sorterMenus = [
@@ -171,9 +170,12 @@ export class AllArticle extends Component {
             onSearch={this.handlerSearch}
           />
           <InfiniteScroll
-            customClassName={[styles.list_content, refreshing ? styles.refreshing : '']}
-            onLoadmore={this.handleLoadmore}
+            customClass={[styles.list_content, refreshing ? styles.refreshing : '']}
+            loadingCustomClass={styles.loadmore_loading}
             loading={fetching}
+            refreshing={refreshing}
+            noMoreData={pagination.current_page >= pagination.total_page}
+            onLoadmore={this.handleLoadmore}
           >
             {
               articleList.length
@@ -187,8 +189,6 @@ export class AllArticle extends Component {
                   />
                 : <NoData show={!fetching && !refreshing} text="NO ARTICLE DATA" iconSize={36} />
             }
-            <ReFreshLoading loading={refreshing} />
-            <Loading className={styles.loadmore_loading} loading={fetching} />
           </InfiniteScroll>
           <div className={styles.list_info}>
             <span className={styles.total_count}>总共{pagination.total}篇文章</span>
