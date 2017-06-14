@@ -24,7 +24,7 @@ var printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 var useYarn = fs.existsSync(paths.yarnLockFile);
 
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+if (!checkRequiredFiles([paths.appHtml, paths.appMainJs])) {
   process.exit(1);
 }
 
