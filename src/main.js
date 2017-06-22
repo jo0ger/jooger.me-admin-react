@@ -3,7 +3,9 @@ import { render } from 'react-dom'
 import AppContainer from '~containers/AppContainer'
 import createRoutes from '~routes'
 import createStore from '~store/createStore'
+import Perf from 'react-addons-perf'
 import '~styles/index'
+
 
 const MOUNT_NODE = document.getElementById('root')
 
@@ -12,6 +14,7 @@ const renderApp = (DevTools = null) => {
   const routes = createRoutes(store)
   
   if (__DEV__) {
+    window.Perf = Perf
     // const DevTools = require('~components/DevTools').default
     render(
       <AppContainer store={store} routes={routes}>

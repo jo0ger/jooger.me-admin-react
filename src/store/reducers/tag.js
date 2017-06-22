@@ -1,5 +1,6 @@
 // Tag 分类
 
+import { fromJS } from 'immutable'
 import Service from '~service'
 
 // ------------------------------------
@@ -24,7 +25,7 @@ export const requestTagListSuccess = data => ({
 })
 
 export const fetchTagList = () => (dispatch, getState) => {
-  if (getState().tag.fetching) {
+  if (getState().getIn(['tag', 'fetching'])) {
     return
   }
   dispatch(requestTagList())
@@ -53,31 +54,19 @@ export const fetchTagList = () => (dispatch, getState) => {
 // ACTION_HANDLERS
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [FETCH_TAG_LIST_REQUEST]: state => ({
-    ...state,
-    fetching: true
-  }),
-  [FETCH_TAG_LIST_FAILURE]: state => ({
-    ...state,
-    fetching: false
-  }),
-  [FETCH_TAG_LIST_SUCCESS]: (state, { list }) => {
-    return {
-      ...state,
-      fetching: false,
-      list
-    }
-  }
+  [FETCH_TAG_LIST_REQUEST]: state => state.merge({ fetching: true }),
+  [FETCH_TAG_LIST_FAILURE]: state => state.merge({ fetching: false }),
+  [FETCH_TAG_LIST_SUCCESS]: (state, data) => state.merge({ fetching: false, list: data.get('list') })
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = {
+const initialState = fromJS({
   fetching: false,
   saving: false,
   list: []
-}
+})
 export default function tagReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action.payload) : state

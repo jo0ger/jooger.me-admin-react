@@ -58,7 +58,7 @@ export class QiniuUpload {
 		if (code) {
 			return
 		}
-		const config = data
+		const config = data.toJS()
 		validateConfig(config)
     const formData = new FormData()
     formData.append('token', config.uptoken)

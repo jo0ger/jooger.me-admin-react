@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal } from 'antd'
+import BaseComponent from '~components/BaseComponent'
 import Page from '~components/Page'
 import ListFilter from '~components/ListFilter'
 import ArticleList from './ArticleList'
@@ -16,7 +17,7 @@ const sorterMenus = [
   { key: 'update_at+1', name: '更新时间（最早优先）' }
 ]
 
-export class AllArticle extends Component {
+export class AllArticle extends BaseComponent {
 
   state = {
     searchText: '',

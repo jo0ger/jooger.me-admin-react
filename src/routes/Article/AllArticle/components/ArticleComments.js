@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, Icon, message, Radio } from 'antd'
+import BaseComponent from '~components/BaseComponent'
 import Transition from '~components/Transition'
 import NoData from '~components/NoData'
 import InfiniteScroll from '~components/InfiniteScroll'
@@ -13,7 +14,7 @@ import { admin } from '~config'
 const RadioButton = Radio.Button
 const RadioGroup = Radio.Group
 
-export class ArticleComments extends Component {
+export class ArticleComments extends BaseComponent {
 
   state = {
     fetching: false,
@@ -38,7 +39,7 @@ export class ArticleComments extends Component {
       return message.info('正在获取评论...')
     }
     this.setState({ [refresh ? 'refreshing' : 'fetching']: true })
-    const { code, data } = await Service.comment.getList({
+    let { code, data } = await Service.comment.getList({
       params: {
         page_id: this.props.articleId,
         page: refresh ? 1 : pagination.current_page + 1,
@@ -47,6 +48,7 @@ export class ArticleComments extends Component {
     })
     this.setState({ [refresh ? 'refreshing' : 'fetching']: false })
     if (!code) {
+      data = data.toJS()
       this.setState({
         commentList: refresh ? data.list : [...commentList, ...data.list],
         pagination: data.pagination,
@@ -70,19 +72,30 @@ export class ArticleComments extends Component {
       }
     }).then(({ code, data }) => {
       if (!code) {
-        this.handleAddComment(data)
+        this.handleAddComment(data.toJS())
         cb && cb()
       }
       return !code
-    }).catch(err => message.error(err.message || err))
+    }).catch(err => {
+      message.error(err.message || err)
+      console.error(err.message || err)
+    })
   }
 
   handleAddComment = comment => {
-    if (!comment || !comment._id) {
+    if (!comment._id) {
       return
     }
+    const { articleDetail, onReplySuccess } = this.props
     this.setState({
       commentList: [comment, ...this.state.commentList]
+    })
+    const _article = {...articleDetail}
+    _article.meta.comments++
+    console.log(_article)
+    onReplySuccess({
+      id: comment._id,
+      data: _article
     })
   }
 
@@ -118,8 +131,6 @@ export class ArticleComments extends Component {
   render () {
     const { commentList, fetching, refreshing, pagination } = this.state
     const { articleId } = this.props
-
-    console.log('articleId')
 
     return (
       <Transition name="slide-right-100">
@@ -162,7 +173,9 @@ export class ArticleComments extends Component {
 
 ArticleComments.propTypes = {
   articleId: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired
+  articleDetail: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onReplySuccess: PropTypes.func.isRequired
 }
 
 export default ArticleComments

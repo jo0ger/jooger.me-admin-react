@@ -6,7 +6,7 @@ import { fetchCategoryList } from '~store/reducers/category'
 import { fetchTagList } from '~store/reducers/tag'
 
 const mapStateToProps = state => {
-  const { list, pagination, refreshing, fetching, saving, deleting, currentArticleId } = state.article
+  const { list, pagination, refreshing, fetching, saving, deleting, currentArticleId } = state.get('article').toJS()
   return {
     articleList: list,
     pagination,

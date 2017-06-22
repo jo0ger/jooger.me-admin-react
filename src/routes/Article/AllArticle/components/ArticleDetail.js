@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Button, Form, Input, Popover, Tag, Icon, Radio, Upload, Modal, Col, Badge, Card } from 'antd'
+import BaseComponent from '~components/BaseComponent'
 import NoData from '~components/NoData'
 import MarkdownEditor from '~components/MarkdownEditor'
 import commands from '~utils/markdownEditorHelper/commands'
@@ -51,7 +52,7 @@ const getArticleStatus = state => {
   }
 }
 
-export class ArticleDetail extends Component {
+export class ArticleDetail extends BaseComponent {
 
   constructor (props) {
     super(props)
@@ -441,7 +442,7 @@ export class ArticleDetail extends Component {
   
   render () {
     const { articleModel, editMode, showComments, mdeCommands } = this.state
-    const { currentArticle, saving } = this.props
+    const { currentArticle, saving, editArticleSuccess } = this.props
 
     return (
       <div className={styles.article_detail}>
@@ -519,6 +520,8 @@ export class ArticleDetail extends Component {
                       ? <ArticleComments
                           articleId={articleModel._id}
                           onClose={this.handleCloseComments}
+                          articleDetail={currentArticle}
+                          onReplySuccess={editArticleSuccess}
                         />
                       : null
                   }
@@ -539,7 +542,8 @@ ArticleDetail.propTypes = {
   categoryFetching: PropTypes.bool.isRequired,
   tagList: PropTypes.array.isRequired,
   tagFetching: PropTypes.bool.isRequired,
-  editArticleItem: PropTypes.func.isRequired
+  editArticleItem: PropTypes.func.isRequired,
+  editArticleSuccess: PropTypes.func.isRequired
 }
 
 export default ArticleDetail

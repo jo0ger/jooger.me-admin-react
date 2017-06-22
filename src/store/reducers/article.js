@@ -1,5 +1,6 @@
 // 文章列表
 
+import { fromJS } from 'immutable'
 import Service from '~service'
 import { message } from 'antd'
 import { isType } from '~utils'
@@ -22,7 +23,8 @@ const defaultArticleModel = {
 }
 
 // 现在是否有任务在进行
-const isProcessCarryOut = ({ article: { creating, fetching, saving, deleting } }) => {
+const isProcessCarryOut = state => {
+  const { creating, fetching, saving, deleting } = state.get('article').toJS()
   const isProcessing = creating || fetching || saving || deleting
   return isProcessing ? (
     message.warning('当前有文章任务在进行，请勿操作'),
@@ -46,7 +48,7 @@ export const requestList = refresh => ({
 // list请求成功
 export const requestListSuccess = (data, refresh) => ({
   type: FETCH_ARTICLE_LIST_SUCCESS,
-  payload: { ...data, refresh }
+  payload: { data, refresh }
 })
 
 // list请求失败
@@ -161,7 +163,7 @@ export const editArticleItem = (params = {}, id, status) => (dispatch, getState)
       }
     }).then(({ code }) => {
       if (!code) {
-        dispatch(editArticleSuccess({id, status}))
+        dispatch(editArticleSuccess({ id, status }))
       } else {
         dispatch(editArticleFailure())
       }
@@ -169,7 +171,7 @@ export const editArticleItem = (params = {}, id, status) => (dispatch, getState)
   }
   return Service.article.editItem(id)({ data: params }).then(({ code, data }) => {
     if (!code) {
-      dispatch(editArticleSuccess({id, data}))
+      dispatch(editArticleSuccess({id, data: data.toJS()}))
     } else {
       dispatch(editArticleFailure())
     }
@@ -243,105 +245,85 @@ export const deleteArticleItem = (id) => (dispatch, getState) => {
 // ACTION HANDLERS
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [FETCH_ARTICLE_LIST_REQUEST]: (state, refresh) => ({
-    ...state,
-    [refresh ? 'refreshing' : 'fetching']: true
-  }),
-  [FETCH_ARTICLE_LIST_SUCCESS]: (state, { list, pagination, refresh }) => {
-    return {
-      ...state,
+  [FETCH_ARTICLE_LIST_REQUEST]: (state, { refresh }) => {
+    return state.merge({
+      [refresh ? 'refreshing' : 'fetching']: true
+    })
+  },
+  [FETCH_ARTICLE_LIST_SUCCESS]: (state, { data, refresh }) => {
+    const list = data.get('list')
+    return state.merge({
       refreshing: false,
       fetching: false,
-      list: refresh ? list : [...state.list, ...list],
-      pagination
-    }
+      list: refresh ? list : state.get('list').concat(list),
+      pagination: data.get('pagination')
+    })
   },
-  [FETCH_ARTICLE_LIST_FAILURE]: (state, err) => ({
-    ...state,
-    refreshing: false,
-    fetching: false
-  }),
-  [VIEW_ARTICLE_ITEM]: (state, currentArticleId) => ({
-    ...state,
-    currentArticleId
-  }),
-  [CREATE_ARTICLE_ITEM_REQUEST]: state => ({
-    ...state,
-    creating: true
-  }),
-  [CREATE_ARTICLE_ITEM_FAILURE]: state => ({
-    ...state,
-    creating: false
-  }),
+  [FETCH_ARTICLE_LIST_FAILURE]: (state, err) => {
+    return state.merge({
+      refreshing: false,
+      fetching: false
+    })
+  },
+  [VIEW_ARTICLE_ITEM]: (state, currentArticleId) => {
+    return state.merge({ currentArticleId })
+  },
+  [CREATE_ARTICLE_ITEM_REQUEST]: state => state.merge({ creating: true }),
+  [CREATE_ARTICLE_ITEM_FAILURE]: state => state.merge({ creating: false }),
   [CREATE_ARTICLE_ITEM_SUCCESS]: (state, data) => {
-    return {
-      ...state,
-      list: [data, ...state.list],
+    return state.merge({
+      list: state.get('list').unshift(data).toJS(),
       creating: false
-    }
+    })
   },
-  [EDIT_ARTICLE_ITEM_REQUEST]: state => ({
-    ...state,
-    saving: true
-  }),
-  [EDIT_ARTICLE_ITEM_FAILURE]: state => ({
-    ...state,
-    saving: false
-  }),
+  [EDIT_ARTICLE_ITEM_REQUEST]: state => state.merge({ saving: true }),
+  [EDIT_ARTICLE_ITEM_FAILURE]: state => state.merge({ saving: false }),
   [EDIT_ARTICLE_ITEM_SUCCESS]: (state, { id, data, status }) => {
-    const articleList = [...state.list]
+    const articleList = state.get('list').toJS()
     if (isType(id, 'array')) {
       // 批量修改状态
       id.map(article_id => {
-        let index = state.list.findIndex(item => item._id === article_id)
+        let index = articleList.findIndex(item => item._id === article_id)
         articleList[index].state = status
         return article_id
       })
     } else {
       // 单篇修改内容
-      const index = state.list.findIndex(item => item._id === id)
+      const index = articleList.findIndex(item => item._id === id)
       articleList.splice(index, 1, data)
     }
-    return {
-      ...state,
+    return state.merge({
       saving: false,
       list: articleList
-    }
+    })
   },
-  [DELETE_ARTICLE_ITEM_REQUEST]: state => ({
-    ...state,
-    deleting: true
-  }),
-  [DELETE_ARTICLE_ITEM_FAILURE]: state => ({
-    ...state,
-    deleting: false
-  }),
+  [DELETE_ARTICLE_ITEM_REQUEST]: state => state.merge({ deleting: true }),
+  [DELETE_ARTICLE_ITEM_FAILURE]: state => state.merge({ deleting: false }),
   [DELETE_ARTICLE_ITEM_SUCCESS]: (state, id) => {
-    let articleList = [...state.list]
+    let articleList = state.toJS().list
     if (isType(id, 'array')) {
       // 批量删除
       id.map(article_id => {
-        let index = state.list.findIndex(item => item._id === article_id)
+        let index = articleList.findIndex(item => item._id === article_id)
         articleList.splice(index, 1)
         return article_id
       })
     } else {
       // 单篇删除
-      const index = state.list.findIndex(item => item._id === id)
+      const index = articleList.findIndex(item => item._id === id)
       articleList.splice(index, 1)
     }
-    return {
-      ...state,
+    return state.merge({
       deleting: false,
       list: articleList
-    }
+    })
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = {
+const initialState = fromJS({
   fetching: false,            // 列表获取状态
   creating: false,            // 文章新建状态
   saving: false,              // 列表保存状态
@@ -350,7 +332,7 @@ const initialState = {
   list: [],                   // 列表LIST
   pagination: {},             // 列表分页信息
   currentArticleId: '593bc036e1f07c2e2c37901c'        // 当前正在查看/编辑的文章ID
-}
+})
 export default function articleListReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action.payload) : state

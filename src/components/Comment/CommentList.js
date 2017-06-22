@@ -94,6 +94,7 @@ export class CommentList extends Component {
     })
     Service.comment.getItem(commentId)().then(({ code, data }) => {
       this.setState({ talkFetching: false })
+      data = data.toJS()
       if (!code && data) {
         let forward = data.forward
         const talkList = [data]
@@ -140,7 +141,7 @@ export class CommentList extends Component {
     }
     return Service.comment.create({ data }).then(({ code, data }) => {
       if (!code) {
-        onAddComment(data)
+        onAddComment(data.toJS())
         cb && cb()
         this.setState({
           replyingId: '',

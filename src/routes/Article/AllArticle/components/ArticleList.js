@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Tag, Icon } from 'antd'
+import BaseComponent from '~components/BaseComponent'
 import ListItem from '~components/ListItem'
 import DropOption from '~components/DropOption'
 import styles from '../assets/ArticleList'
@@ -20,7 +21,7 @@ const allToolMenus = [
 
 const getcurrentToolMenus = status => allToolMenus.filter(item => item.status !== status || item.status === 'always')
 
-export class ArticleList extends Component {
+export class ArticleList extends BaseComponent {
 
   handleItemSlected = id => this.props.onItemSelected(id)
 

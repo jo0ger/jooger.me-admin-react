@@ -1,4 +1,5 @@
-import { combineReducers } from 'redux'
+// import { combineReducers } from 'redux'
+import { combineReducers } from 'redux-immutable'
 import articleReducer from './article'
 import categoryReducer from './category'
 import tagReducer from './tag'

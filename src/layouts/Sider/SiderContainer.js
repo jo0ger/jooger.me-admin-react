@@ -3,9 +3,8 @@ import Sider from './Sider'
 import { createArticleItem } from '~store/reducers/article'
 
 const mapStateToProps = state => {
-  const articleCreating = state.article.creating
   return {
-    articleCreating
+    articleCreating: state.getIn(['article', 'creating'])
   }
 }
 

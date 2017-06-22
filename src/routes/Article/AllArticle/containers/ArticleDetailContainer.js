@@ -1,9 +1,9 @@
 import { connect } from 'react-redux'
 import ArticleDetail from '../components/ArticleDetail'
-import { editArticleItem } from '~store/reducers/article'
+import { editArticleItem, editArticleSuccess } from '~store/reducers/article'
 
 const mapStateToProps = state => {
-  const { article, category, tag } = state
+  const { article, category, tag } = state.toJS()
   const { currentArticleId, list, saving } = article
   return {
     currentArticle: list.find(item => item._id === currentArticleId) || {},
@@ -16,7 +16,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-  editArticleItem
+  editArticleItem,
+  editArticleSuccess
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ArticleDetail)

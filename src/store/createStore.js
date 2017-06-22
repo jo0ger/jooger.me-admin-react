@@ -1,9 +1,10 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
+import Immutable from 'immutable'
 import makeRootReducer from './reducers'
 
-export const createStoreWithMiddleware = (initialState = {}) => {
+export const createStoreWithMiddleware = (initialState = Immutable.Map()) => {
   const middleWare = [
     thunk
   ]

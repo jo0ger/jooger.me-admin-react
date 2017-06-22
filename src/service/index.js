@@ -1,3 +1,4 @@
+import { fromJS } from 'immutable'
 import axios from 'axios'
 import { message } from 'antd'
 
@@ -27,7 +28,8 @@ fetcher.interceptors.response.use(response => {
     // TODO 提示服务器异常
     message.error('服务器异常')
   }
-  switch (response.data.code) {
+  const { code, data } = response.data
+  switch (code) {
     case code.UNAUTHORIZED:
       message.warning('禁地勿闯！！！')
       break
@@ -42,7 +44,7 @@ fetcher.interceptors.response.use(response => {
     default:
       break
   }
-  return response.data
+  return { code, data: fromJS(data) }
 }, error => {
   let status = error.response.status
   message.error('请求错误' + (status ? `，code:${status}` : ''))

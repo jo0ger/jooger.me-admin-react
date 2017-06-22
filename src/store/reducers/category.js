@@ -1,5 +1,6 @@
 // Category 分类
 
+import { fromJS } from 'immutable'
 import Service from '~service'
 
 // ------------------------------------
@@ -24,7 +25,7 @@ export const requestCategoryListSuccess = data => ({
 })
 
 export const fetchCategoryList = () => (dispatch, getState) => {
-  if (getState().category.fetching) {
+  if (getState().getIn(['category', 'fetching'])) {
     return
   }
   dispatch(requestCategoryList())
@@ -53,29 +54,19 @@ export const fetchCategoryList = () => (dispatch, getState) => {
 // ACTION_HANDLERS
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [FETCH_CATEGORY_LIST_REQUEST]: state => ({
-    ...state,
-    fetching: true
-  }),
-  [FETCH_CATEGORY_LIST_FAILURE]: state => ({
-    ...state,
-    fetching: false
-  }),
-  [FETCH_CATEGORY_LIST_SUCCESS]: (state, { list }) => ({
-    ...state,
-    fetching: false,
-    list
-  })
+  [FETCH_CATEGORY_LIST_REQUEST]: state => state.merge({ fetching: true }),
+  [FETCH_CATEGORY_LIST_FAILURE]: state => state.merge({ fetching: false }),
+  [FETCH_CATEGORY_LIST_SUCCESS]: (state, data) => state.merge({ fetching: false, list: data.get('list') })
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = {
+const initialState = fromJS({
   fetching: false,
   saving: false,
   list: []
-}
+})
 export default function categoryReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action.payload) : state
