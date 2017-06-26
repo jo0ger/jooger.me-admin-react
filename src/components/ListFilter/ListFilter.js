@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Input } from 'antd'
 import DropOption from '~components/DropOption'
 import styles from './ListFilter.styl'
+import { classnames } from '~utils'
 
 const Search = Input.Search
 
@@ -11,7 +12,7 @@ export const ListFilter = (props) => {
   const onChange = e => onInput && onInput(e.target.value)
   const onSearchInput = val => onSearch(val.trim())
   return (
-    <div className={styles.list_filter}>
+    <div className={classnames([styles.list_filter, !sorterMenus && styles.no_sorter])}>
       <div className={styles.input_search}>
         <Search 
           placeholder="搜索"
@@ -19,23 +20,29 @@ export const ListFilter = (props) => {
           onSearch={onSearchInput}
         />
       </div>
-      <div className={styles.sorter_group}>
-        <DropOption
-          buttonClass="sorter_btn"
-          menuIcon="bars"
-          menuOptions={sorterMenus}
-          selectedKeys={selectedSorterKeys}
-          buttonStyle={{ display: 'block', width: 50, textAlign: 'center' }}
-          onMenuClick={onMenuClick}
-        />
-      </div>
+      {
+        sorterMenus
+          ? (
+              <div className={styles.sorter_group}>
+                <DropOption
+                  buttonClass="sorter_btn"
+                  menuIcon="bars"
+                  menuOptions={sorterMenus}
+                  selectedKeys={selectedSorterKeys}
+                  buttonStyle={{ display: 'block', width: 50, textAlign: 'center' }}
+                  onMenuClick={onMenuClick}
+                />
+              </div>
+            )
+          : null
+      }
     </div>  
   )
 }
 
 ListFilter.propTypes = {
-  sorterMenus: PropTypes.array.isRequired,
-  onMenuClick: PropTypes.func.isRequired,
+  sorterMenus: PropTypes.array,
+  onMenuClick: PropTypes.func,
   onSearch: PropTypes.func.isRequired,
   onInput: PropTypes.func
 }

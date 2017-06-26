@@ -81,7 +81,7 @@ export class AllArticle extends BaseComponent {
     })
   }
 
-  handlerSearch = val => {
+  handleSearch = val => {
     if (val === this.state.searchText && !!val) {
       return
     }
@@ -168,7 +168,7 @@ export class AllArticle extends BaseComponent {
             sorterMenus={sorterMenus}
             selectedSorterKeys={this.state.selectedSorterKeys}
             onMenuClick={this.handleSorterMenuClick}
-            onSearch={this.handlerSearch}
+            onSearch={this.handleSearch}
           />
           <InfiniteScroll
             customClass={[styles.list_content, refreshing ? styles.refreshing : '']}

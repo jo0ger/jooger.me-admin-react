@@ -6,12 +6,7 @@ import BaseComponent from '~components/BaseComponent'
 import ListItem from '~components/ListItem'
 import DropOption from '~components/DropOption'
 import styles from '../assets/ArticleList'
-import { classnames, fmtDate } from '~utils'
-
-const findCategoryExtendsItemValue = (extendsList = [], key = '') => {
-  const matchedItem = extendsList.find(item => item.key === key)
-  return matchedItem ? matchedItem.value : null
-}
+import { classnames, fmtDate, findExtendsItemValue} from '~utils'
 
 const allToolMenus = [
   { key: 'publish', name: '发布', status: 1 },
@@ -53,7 +48,7 @@ export class ArticleList extends BaseComponent {
                     ? <Link to={`/article/category/${item.category.name}`}>
                         <Tag
                           className={styles.category}
-                          color={findCategoryExtendsItemValue(item.category.extends, 'color')}
+                          color={findExtendsItemValue(item.category.extends, 'color')}
                         >
                           {item.category.name}
                         </Tag>

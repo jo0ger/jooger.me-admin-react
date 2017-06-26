@@ -5,6 +5,7 @@ import { Button, Form, Input, Popover, Tag, Icon, Radio, Upload, Modal, Col, Bad
 import BaseComponent from '~components/BaseComponent'
 import NoData from '~components/NoData'
 import MarkdownEditor from '~components/MarkdownEditor'
+import Extends from '~components/Extends'
 import commands from '~utils/markdownEditorHelper/commands'
 import Thumb from './Thumb'
 import ArticleComments from './ArticleComments'
@@ -235,6 +236,8 @@ export class ArticleDetail extends BaseComponent {
     this.setArticleModelByKey('extends', articleExtends)
   }
 
+  handleExtendsChange = _extends => this.setArticleModelByKey('extends', _extends)
+  
   handleViewComments = () => this.setState({ showComments: !this.state.showComments })
 
   handleCloseComments = () => this.setState({ showComments: false })
@@ -433,7 +436,12 @@ export class ArticleDetail extends BaseComponent {
                       )
                     : '暂无扩展项'
                 )
-              : this.extendsRender()
+              : (
+                  <Extends
+                    extendsModel={articleModel.extends}
+                    onChange={this.handleExtendsChange}
+                  />
+                )
           }
         </FormItem>
       </Form>

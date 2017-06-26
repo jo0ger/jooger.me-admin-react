@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Loading from './Loading'
-import styles from './RefreshLoading.styl'
+import styles from './ReFreshLoading.styl'
 
 export const RefreshLoading = ({ loading = false }) => {
   return loading ? (

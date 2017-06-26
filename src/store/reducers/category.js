@@ -2,6 +2,23 @@
 
 import { fromJS } from 'immutable'
 import Service from '~service'
+import { message } from 'antd'
+
+const defaultCategoryModel = {
+  name: '',
+  description: '',
+  extends: []
+}
+
+// 现在是否有任务在进行
+const isProcessCarryOut = state => {
+  const { creating, fetching, saving, deleting } = state.get('category').toJS()
+  const isProcessing = creating || fetching || saving || deleting
+  return isProcessing ? (
+    message.warning('当前有文章任务在进行，请勿操作'),
+    isProcessing
+  ) : isProcessing
+}
 
 // ------------------------------------
 // Category 获取请求
@@ -39,12 +56,74 @@ export const fetchCategoryList = () => (dispatch, getState) => {
 
 
 // ------------------------------------
-// Article Detail 获取请求
+// Category Item 新建
 // ------------------------------------
+const CREATE_CATEGORY_ITEM_REQUEST = 'CREATE_CATEGORY_ITEM_REQUEST'
+const CREATE_CATEGORY_ITEM_SUCCESS = 'CREATE_CATEGORY_ITEM_SUCCESS'
+const CREATE_CATEGORY_ITEM_FAILURE = 'CREATE_CATEGORY_ITEM_FAILURE'
+
+export const createCategoryItemRequest = () => ({
+  type: CREATE_CATEGORY_ITEM_REQUEST
+})
+
+export const createCategoryItemFailure = err => ({
+  type: CREATE_CATEGORY_ITEM_FAILURE,
+  payload: err
+})
+
+export const createCategoryItemSuccess = data => ({
+  type: CREATE_CATEGORY_ITEM_SUCCESS,
+  payload: data
+})
+
+export const createCategoryItem = (params = defaultCategoryModel) => (dispatch, getState) => {
+  if (isProcessCarryOut(getState())) {
+    return
+  }
+  return Service.category.create({ data: params }).then(({ code, data }) => {
+    if (!code) {
+      dispatch(createCategoryItemSuccess(data))
+    } else {
+      dispatch(createCategoryItemFailure())
+    }
+    return code
+  }).catch(err => dispatch(createCategoryItemFailure(err)))
+}
 
 // ------------------------------------
-// Article Detail 获取请求
+// Caterogy Item 删除
 // ------------------------------------
+const DELETE_CATEGORY_ITEM_REQUEST = 'DELETE_CATEGORY_ITEM_REQUEST'
+const DELETE_CATEGORY_ITEM_FAILURE = 'DELETE_CATEGORY_ITEM_FAILURE'
+const DELETE_CATEGORY_ITEM_SUCCESS = 'DELETE_CATEGORY_ITEM_SUCCESS'
+
+export const deleteCategoryItemRequest = () => ({
+  type: DELETE_CATEGORY_ITEM_REQUEST
+})
+
+export const deleteCategoryItemFailure = err => ({
+  type: DELETE_CATEGORY_ITEM_FAILURE,
+  payload: err
+})
+
+export const deleteCategoryItemSuccess = index => ({
+  type: DELETE_CATEGORY_ITEM_SUCCESS,
+  payload: index
+})
+
+export const deleteCategoryItem = (id, index) => (dispatch, getState) => {
+  if (isProcessCarryOut(getState())) {
+    return
+  }
+  dispatch(deleteCategoryItemRequest())
+  return Service.category.deleteItem(id)().then(({ code }) => {
+    if (!code) {
+      dispatch(deleteCategoryItemSuccess(index))
+    } else {
+      dispatch(deleteCategoryItemFailure())
+    }
+  }).catch(err => dispatch(DELETE_CATEGORY_ITEM_FAILURE(err)))
+}
 
 // ------------------------------------
 // Article Detail 获取请求
@@ -56,7 +135,23 @@ export const fetchCategoryList = () => (dispatch, getState) => {
 const ACTION_HANDLERS = {
   [FETCH_CATEGORY_LIST_REQUEST]: state => state.merge({ fetching: true }),
   [FETCH_CATEGORY_LIST_FAILURE]: state => state.merge({ fetching: false }),
-  [FETCH_CATEGORY_LIST_SUCCESS]: (state, data) => state.merge({ fetching: false, list: data.get('list') })
+  [FETCH_CATEGORY_LIST_SUCCESS]: (state, data) => state.merge({ fetching: false, list: data.get('list') }),
+  [CREATE_CATEGORY_ITEM_REQUEST]: state => state.merge({ creating: true }),
+  [CREATE_CATEGORY_ITEM_REQUEST]: state => state.merge({ creating: false }),
+  [CREATE_CATEGORY_ITEM_SUCCESS]: (state, data) => state.merge({
+    list: state.get('list').unshift(data).toJS(),
+    creating: false
+  }),
+  [DELETE_CATEGORY_ITEM_REQUEST]: state => state.merge({ deleting: true }),
+  [DELETE_CATEGORY_ITEM_REQUEST]: state => state.merge({ deleting: false }),
+  [DELETE_CATEGORY_ITEM_SUCCESS]: (state, index) => {
+    let categoryList = state.get('list').toJS()
+    categoryList.splice(index, 1)
+    return state.merge({
+      deleting: false,
+      list: categoryList
+    })
+  }
 }
 
 // ------------------------------------
@@ -65,6 +160,8 @@ const ACTION_HANDLERS = {
 const initialState = fromJS({
   fetching: false,
   saving: false,
+  creating: false,
+  deleting: false,
   list: []
 })
 export default function categoryReducer (state = initialState, action) {

@@ -125,6 +125,11 @@ export const deepCopy = function (out = {}) {
   return out
 }
 
+export const findExtendsItemValue = (extendsList = [], key = '') => {
+  const matchedItem = extendsList.find(item => item.key === key)
+  return matchedItem ? matchedItem.value : null
+}
+
 export {
   classnames,
   marked,

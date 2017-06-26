@@ -15,7 +15,6 @@ const getParentPathname = pathname => pathname.split('/')[1]
 
 const createBtns = [
   { path: '/article/all', text: '新建文章' },
-  { path: '/article/category', text: '新建分类' },
   { path: '/article/tag', text: '新建标签' }
 ]
 

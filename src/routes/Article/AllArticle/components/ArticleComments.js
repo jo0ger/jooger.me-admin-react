@@ -86,15 +86,14 @@ export class ArticleComments extends BaseComponent {
     if (!comment._id) {
       return
     }
-    const { articleDetail, onReplySuccess } = this.props
+    const { articleId, articleDetail, onReplySuccess } = this.props
     this.setState({
       commentList: [comment, ...this.state.commentList]
     })
     const _article = {...articleDetail}
     _article.meta.comments++
-    console.log(_article)
     onReplySuccess({
-      id: comment._id,
+      id: articleId,
       data: _article
     })
   }
@@ -140,6 +139,10 @@ export class ArticleComments extends BaseComponent {
           title={this.titleRender()}
           extra={this.titleExtraRender()}
         >
+        <CommentInputBox
+          toArticle
+          onSubmit={this.handleReply}
+        />
         <InfiniteScroll
           customClass={styles.list_wrapper}
           onLoadmore={this.handleLoadmore}
@@ -147,10 +150,6 @@ export class ArticleComments extends BaseComponent {
           refreshing={refreshing}
           noMoreData={pagination.current_page >= pagination.total_page}
         >
-          <CommentInputBox
-            toArticle
-            onSubmit={this.handleReply}
-          />
           {
             commentList.length
               ? <CommentList

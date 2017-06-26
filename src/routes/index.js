@@ -3,7 +3,7 @@ import Bundle from '~components/Bundle'
 import AppLayout from '~layouts/AppLayout'
 import Login from './Login'
 import Home from './Home'
-import { AllArticleLoader } from './Article'
+import { AllArticleLoader, CategoryLoader } from './Article'
 import PageNotFound from './PageNotFound'
 
 const bundleAsyncRoute = ({ load, callback, ...rest }, Loading = null) => {
@@ -54,7 +54,7 @@ export const createRoutes = store => {
       {
         path: '/article/category',
         name: 'Category',
-        component: bundleAsyncRoute(AllArticleLoader(store)),
+        component: bundleAsyncRoute(CategoryLoader(store)),
         exact: true
       },
       {

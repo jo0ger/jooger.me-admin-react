@@ -5,11 +5,11 @@ import { message } from 'antd'
 const isProd = process.env.NODE_ENV === 'production'
 
 export const fetcher = axios.create({
-  baseURL: !isProd ? 'http://localhost:5000/v1' : 'http://api.jooger.com/v1',
+  baseURL: !isProd ? 'http://192.168.1.103:5000/v1' : 'http://api.jooger.com/v1',
   timeout: 5000
 })
 
-const code = {
+const CODE = {
   FAILED: -1,
   SUCCESS: 0,
   UNAUTHORIZED: 401
@@ -30,13 +30,13 @@ fetcher.interceptors.response.use(response => {
   }
   const { code, data } = response.data
   switch (code) {
-    case code.UNAUTHORIZED:
+    case CODE.UNAUTHORIZED:
       message.warning('禁地勿闯！！！')
       break
-    case code.FAILED:
+    case CODE.FAILED:
       message.error(response.data.message)
       break
-    case code.SUCCESS:
+    case CODE.SUCCESS:
       if (response.config.method.toLocaleUpperCase() !== 'GET') {
         message.success(response.data.message)
       }
