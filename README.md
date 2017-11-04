@@ -75,12 +75,12 @@ state = {
 
 ### 文章详情页
 
-![article_detail](https://raw.githubusercontent.com/jo0ger/jooger.me-admin/master/screenshots/article_detail.png)
+![article_detail](https://github.com/jo0ger/jooger.me-admin-react/blob/master/screenshots/article_detail.png)
 
 ### MarkdownEditor
 
-![markdown_editor](https://raw.githubusercontent.com/jo0ger/jooger.me-admin/master/screenshots/markdown_editor.png)
+![markdown_editor](https://github.com/jo0ger/jooger.me-admin-react/blob/master/screenshots/markdown_editor.png)
 
 ### 文章评论
 
-![article_comment](https://raw.githubusercontent.com/jo0ger/jooger.me-admin/master/screenshots/article_comment.png)
+![article_comment](https://github.com/jo0ger/jooger.me-admin-react/blob/master/screenshots/article_comment.png)
